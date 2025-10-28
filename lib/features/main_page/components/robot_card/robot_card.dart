@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isaac_app/features/control_panel/control_panel.dart';
 import 'package:isaac_app/features/main_page/data/index.dart';
 
 class RobotCard extends ConsumerWidget {
@@ -14,6 +15,10 @@ class RobotCard extends ConsumerWidget {
       child: GestureDetector(
         onTap: () {
           selectedRobotNotifier.selectRobot(currentRobot["name"]!);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ControlPanel(),),
+          );
         },
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),

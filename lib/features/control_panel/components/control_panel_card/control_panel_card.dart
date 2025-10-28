@@ -7,26 +7,36 @@ class ControlPanelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        spacing: 10,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Colors.blue,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) {
+            return element.goTopage;
+          }),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          spacing: 10,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: Colors.blue,
+              ),
+              child: Icon(
+                  element.icon,
+                  size: Theme.of(context).textTheme.displayLarge!.fontSize,
+                color: Colors.white,
+              ),
             ),
-            child: Icon(
-                element.icon,
-                size: Theme.of(context).textTheme.displayLarge!.fontSize,
-              color: Colors.white,
-            ),
-          ),
-          Text(element.formatName(element.name)),
-        ],
+            Text(element.formatName(element.name)),
+          ],
+        ),
       ),
     );
   }

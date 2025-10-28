@@ -25,7 +25,7 @@ class ControlPanelCard extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          Text(element.name),
+          Text(element.formatName(element.name)),
         ],
       ),
     );

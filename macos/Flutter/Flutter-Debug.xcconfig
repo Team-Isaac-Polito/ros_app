@@ -1,6 +1,5 @@
 #include "ephemeral/Flutter-Generated.xcconfig"
-/*
- * this line of code is important because otherwise it will not
- * run on macos because our code is not official signed
- */
+
+ // this line of code is important because otherwise it will not
+ // run on macos because our code is not official signed
 CODE_SIGNING_ALLOWED=NO

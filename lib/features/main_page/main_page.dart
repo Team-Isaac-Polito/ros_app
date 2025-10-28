@@ -9,6 +9,7 @@ class MainPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 
     final robots = ref.watch(robotsProvider);
+    final selectedRobotNotifier = ref.watch(selectedRobotProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -22,14 +23,19 @@ class MainPage extends ConsumerWidget {
           final currentRobot = robots[index];
 
           return Center(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.all(40),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
-                border: Border.all(width: 1.0, color: Colors.black),
+            child: GestureDetector(
+              onTap: () {
+                selectedRobotNotifier.selectRobot(currentRobot["name"]!);
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(40),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                  border: Border.all(width: 1.0, color: Colors.black),
+                ),
+                child: Text(currentRobot["name"]!),
               ),
-              child: Text(currentRobot["name"]!),
             ),
           );
         },

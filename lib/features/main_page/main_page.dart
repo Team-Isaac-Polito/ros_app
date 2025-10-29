@@ -14,14 +14,23 @@ class MainPage extends ConsumerWidget {
           title: Text("Choose the robot"),
           centerTitle: true,
       ),
-      body: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: robots.length,
-        itemBuilder: (BuildContext context, int index) {
-          final currentRobot = robots[index];
+      body: Row(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(right: 10),
+            width: 200.0 * robots.length,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: robots.length,
+              itemBuilder: (BuildContext context, int index) {
+                final currentRobot = robots[index];
 
-          return RobotCard(currentRobot: currentRobot);
-        },
+                return RobotCard(currentRobot: currentRobot);
+              },
+            ),
+          ),
+          AddRobotButton(),
+        ],
       ),
     );
   }

@@ -6,9 +6,8 @@ class SensorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.only(right: 10, top: 20, bottom: 20),
       width: 300,
-      height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(20)),
       ),

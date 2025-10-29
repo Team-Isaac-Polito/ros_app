@@ -9,40 +9,44 @@ class SensorsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text("Sensors"), centerTitle: true),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 10,
-          children: [
-            Text("Active modules: 5 su 60"),
-            ExpansionTile(
-              title: Text('Legenda simboli'),
-              children: <Widget>[
-                ListTile(
-                  leading: Icon(Icons.check),
-                  title: Text('working ok'),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 10,
+            children: [
+              Text("Active modules: 5 su 60"),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.3,
+                child: ExpansionTile(
+                  title: Text('Legenda simboli'),
+                  children: <Widget>[
+                    ListTile(
+                      leading: Icon(Icons.check),
+                      title: Text('working ok'),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.warning),
+                      title: Text('Warning'),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.offline_bolt),
+                      title: Text('Offline'),
+                    ),
+                  ],
                 ),
-                ListTile(
-                    leading: Icon(Icons.warning),
-                    title: Text('Warning'),
-                ),
-                ListTile(
-                  leading: Icon(Icons.offline_bolt),
-                  title: Text('Offline'),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 150,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 2,
-                    itemBuilder: (BuildContext context, int index) {
-                      return SensorCard();
-                    },
-                )
-            ),
-          ],
+              ),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  SensorCard(),
+                  SensorCard(),
+                  SensorCard()
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

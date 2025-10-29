@@ -12,21 +12,14 @@ class ControlPanel extends ConsumerWidget {
     final folders = ref.watch(folderListProvider);
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text(selectedRobot!.robotName),
-          centerTitle: true,
-        ),
+      appBar: AppBar(title: Text(selectedRobot!.robotName), centerTitle: true),
       body: Container(
         margin: const EdgeInsets.symmetric(vertical: 20),
-        child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: folders.length,
-            itemBuilder: (BuildContext context, int index) {
-              final Folder currentFolder = folders[index];
-              return ControlPanelCard(
-                element: currentFolder
-              );
-            }),
+        child: Wrap(
+          children: folders.map((Folder f) {
+            return ControlPanelCard(element: f);
+          }).toList(),
+        ),
       ),
     );
   }

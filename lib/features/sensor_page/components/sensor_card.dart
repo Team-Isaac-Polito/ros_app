@@ -19,11 +19,11 @@ class SensorCard extends StatelessWidget {
             value: true,
             onChanged: (bool value) {},
           ),
-          Icon(Icons.check),
+          Icon(Icons.check, color: Colors.green,),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 5,
-            children: [Text("77%"), Icon(Icons.battery_charging_full_rounded)],
+            children: [Text("77%"), Icon(Icons.battery_charging_full_rounded, color: Colors.blue,)],
           ),
         ],
       ),

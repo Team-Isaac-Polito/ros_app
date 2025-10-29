@@ -22,15 +22,15 @@ class SensorsPage extends StatelessWidget {
                   title: Text('Legenda simboli'),
                   children: <Widget>[
                     ListTile(
-                      leading: Icon(Icons.check),
+                      leading: Icon(Icons.check, color: Colors.green),
                       title: Text('working ok'),
                     ),
                     ListTile(
-                      leading: Icon(Icons.warning),
+                      leading: Icon(Icons.warning, color: Colors.orange,),
                       title: Text('Warning'),
                     ),
                     ListTile(
-                      leading: Icon(Icons.offline_bolt),
+                      leading: Icon(Icons.offline_bolt, color: Colors.red,),
                       title: Text('Offline'),
                     ),
                   ],

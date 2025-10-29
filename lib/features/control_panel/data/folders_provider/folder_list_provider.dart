@@ -6,6 +6,11 @@ import 'package:isaac_app/features/sensor_page/sensors_page.dart';
 final folderListProvider = Provider<List<Folder>>(
         (ref) => [
           Folder(
+            name: "modules",
+            icon: Icons.extension,
+            goTopage: Container(),
+          ),
+          Folder(
               name: "sensors",
               icon: Icons.sensors,
               goTopage: SensorsPage()
@@ -14,6 +19,11 @@ final folderListProvider = Provider<List<Folder>>(
               name: "wheels",
               icon: Icons.wheelchair_pickup,
               goTopage: Container(),
+          ),
+          Folder(
+            name: "system",
+            icon: Icons.settings,
+            goTopage: Container(),
           ),
         ]
 );

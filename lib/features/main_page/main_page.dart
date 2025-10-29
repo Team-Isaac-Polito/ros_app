@@ -16,9 +16,8 @@ class MainPage extends ConsumerWidget {
       ),
       body: Row(
         children: [
-          Container(
-            margin: const EdgeInsets.only(right: 10),
-            width: 200.0 * robots.length,
+          SizedBox(
+            width: 180.0 * robots.length,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: robots.length,

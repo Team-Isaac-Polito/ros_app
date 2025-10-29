@@ -37,7 +37,7 @@ class AddRobotButton extends StatelessWidget {
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: gray
+                          backgroundColor: gray,
                         ),
                         child: Text(
                           "add",

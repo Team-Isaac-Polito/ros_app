@@ -7,9 +7,13 @@ class SensorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(right: 10, top: 20, bottom: 20),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       width: 300,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(20)),
+        border: Border.all(
+          width: 1,
+        )
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -20,6 +24,7 @@ class SensorCard extends StatelessWidget {
             onChanged: (bool value) {},
           ),
           Icon(Icons.check, color: Colors.green,),
+          Text("Nome sensore"),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 5,

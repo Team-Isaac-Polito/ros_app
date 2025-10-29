@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:isaac_app/features/sensor_page/components/sensor_card.dart';
+import 'package:isaac_app/features/sensors_page/components/sensor_card.dart';
 
 class SensorsPage extends StatelessWidget {
   const SensorsPage({super.key});

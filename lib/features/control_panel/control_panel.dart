@@ -16,15 +16,18 @@ class ControlPanel extends ConsumerWidget {
           title: Text(selectedRobot!.robotName),
           centerTitle: true,
         ),
-      body: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: folders.length,
-          itemBuilder: (BuildContext context, int index) {
-            final Folder currentFolder = folders[index];
-            return ControlPanelCard(
-              element: currentFolder
-            );
-          }),
+      body: Container(
+        margin: const EdgeInsets.symmetric(vertical: 20),
+        child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: folders.length,
+            itemBuilder: (BuildContext context, int index) {
+              final Folder currentFolder = folders[index];
+              return ControlPanelCard(
+                element: currentFolder
+              );
+            }),
+      ),
     );
   }
 }

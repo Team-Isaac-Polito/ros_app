@@ -13,35 +13,15 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(darkModeProvider);
 
-    final darkModeAsync = ref.watch(darkModeProvider);
-
-    return darkModeAsync.when(
-        data: (isDarkMode){
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Robot Controls',
-            themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            home: MainPage(),
-          );
-        },
-        error: (err, st) =>  MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: Scaffold(
-            body: Center(
-              child: Text('Error: $err'),
-            ),
-          ),
-        ),
-        loading: () {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Robot Controls',
-            home: Center(child: CircularProgressIndicator(),),
-          );
-        }
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Robot Controls',
+      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      home: MainPage(),
     );
   }
 }

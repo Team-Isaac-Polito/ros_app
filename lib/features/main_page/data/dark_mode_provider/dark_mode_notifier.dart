@@ -2,17 +2,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
-class DarkModeNotifier extends AsyncNotifier<bool> {
-  late SharedPreferences _prefs;
+class DarkModeNotifier extends Notifier<bool> {
 
-  Future<void> setDarkMode(bool value) async {
-    state = AsyncData(value);
-    await _prefs.setBool("dark_mode", value);
+  Future<void> toggleTheme() async {
+    state = !state;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('darkTheme', state);
+  }
+
+  Future<void> _loadThemePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = prefs.getBool('darkTheme') ?? false;
   }
 
   @override
-  Future<bool> build() async {
-    _prefs = await SharedPreferences.getInstance();
-    return _prefs.getBool("dark_mode") ?? false;
+  bool build() {
+    _loadThemePreference();
+    return false;
   }
 }
+
+

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/control_panel/control_panel.dart';
+import 'package:isaac_app/features/main_page/data/dark_mode_provider/dark_mode_provider.dart';
 import 'package:isaac_app/features/main_page/data/index.dart';
+import 'package:isaac_app/utils/index.dart';
 
 class RobotCard extends ConsumerWidget {
   final Map<String, String> currentRobot;
@@ -10,7 +12,7 @@ class RobotCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedRobotNotifier = ref.watch(selectedRobotProvider.notifier);
-
+    final isDark = ref.watch(darkModeProvider);
     return Center(
       child: GestureDetector(
         onTap: () {
@@ -25,7 +27,10 @@ class RobotCard extends ConsumerWidget {
           padding: const EdgeInsets.all(40),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(15)),
-            border: Border.all(width: 1.0, color: Colors.black),
+            border: Border.all(
+                width: 1.0,
+                color: isDark ? white : black,
+            ),
           ),
           child: Text(currentRobot["name"]!),
         ),

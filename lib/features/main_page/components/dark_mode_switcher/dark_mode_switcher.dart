@@ -7,24 +7,18 @@ class DarkModeSwitcher extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final darkModeAsync = ref.read(darkModeProvider);
-    return darkModeAsync.when(
-        data: (isDarkMode) {
-          return Row(
-            spacing: 20,
-            children: [
-              Text("Dark mode:"),
-              Switch(
-                value: isDarkMode,
-                onChanged: (bool value){
-                  ref.read(darkModeProvider.notifier).setDarkMode(value);
-                },
-              )
-            ],
-          );
-        },
-        error: (err, st) => Text(err.toString()),
-        loading: () => const Center(child: CircularProgressIndicator(),)
+    final isDark = ref.read(darkModeProvider);
+    return Row(
+      spacing: 20,
+      children: [
+        Text("Dark mode:"),
+        Switch(
+          value: isDark,
+          onChanged: (bool value) {
+            ref.read(darkModeProvider.notifier).toggleTheme();
+          },
+        ),
+      ],
     );
   }
 }

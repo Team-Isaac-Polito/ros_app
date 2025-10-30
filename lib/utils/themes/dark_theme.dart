@@ -8,10 +8,10 @@ final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
   ),
   scaffoldBackgroundColor: Colors.black,
-  appBarTheme: const AppBarTheme(
-    backgroundColor: Colors.black54,
-    titleTextStyle: TextStyle(color: white),
-    iconTheme: IconThemeData(color: white),
+  appBarTheme: AppBarTheme(
+    backgroundColor: gray,
+    titleTextStyle: const TextStyle(color: white),
+    iconTheme: const IconThemeData(color: white),
   ),
   switchTheme: SwitchThemeData(
     thumbColor: WidgetStateProperty.all(Colors.deepPurple),

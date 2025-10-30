@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/control_panel/models/index.dart';
+import 'package:isaac_app/features/modules_page/index.dart';
 import 'package:isaac_app/features/sensors_page/sensors_page.dart';
 
 final folderListProvider = Provider<List<Folder>>(
@@ -8,7 +9,7 @@ final folderListProvider = Provider<List<Folder>>(
           Folder(
             name: "modules",
             icon: Icons.extension,
-            goTopage: Container(),
+            goTopage: ModulesPage(),
           ),
           Folder(
               name: "sensors",

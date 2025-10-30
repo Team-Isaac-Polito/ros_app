@@ -21,7 +21,7 @@ class AddRobotButton extends StatelessWidget {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: "Inserisci link websocket",
-                            hintText: "Link web socket",
+                            hintText: "ws://<indirizzo_robot>:9090",
                           ),
                         ),
                     ),

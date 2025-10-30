@@ -21,7 +21,7 @@ class RobotCard extends ConsumerWidget {
           );
         },
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
+          margin: const EdgeInsets.only(right: 20),
           padding: const EdgeInsets.all(40),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(15)),

@@ -1,5 +1,6 @@
 class SelectedRobot {
   final String robotName;
-  const SelectedRobot({required this.robotName});
+  final String robotIp;
+  const SelectedRobot({required this.robotName, required this.robotIp});
 }
 

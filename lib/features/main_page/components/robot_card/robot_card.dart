@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/control_panel/control_panel.dart';
-import 'package:isaac_app/features/main_page/data/dark_mode_provider/dark_mode_provider.dart';
 import 'package:isaac_app/features/main_page/data/index.dart';
 import 'package:isaac_app/utils/index.dart';
 
@@ -16,7 +15,7 @@ class RobotCard extends ConsumerWidget {
     return Center(
       child: GestureDetector(
         onTap: () {
-          selectedRobotNotifier.selectRobot(currentRobot["name"]!);
+          selectedRobotNotifier.selectRobot(currentRobot["name"]!, currentRobot["ip"]!);
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ControlPanel(),),
@@ -32,9 +31,14 @@ class RobotCard extends ConsumerWidget {
                 color: isDark ? white : black,
             ),
           ),
-          child: Text(currentRobot["name"]!),
+          child: Column(
+            children: [
+              Text(currentRobot["name"]!),
+              Text(currentRobot["ip"]!),
+            ],
+          ),
         ),
       ),
-    );;
+    );
   }
 }

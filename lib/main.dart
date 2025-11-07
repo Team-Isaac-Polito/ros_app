@@ -3,10 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/dark_mode_provider/dark_mode_provider.dart';
 import 'package:isaac_app/features/main_page/index.dart';
 import 'package:isaac_app/utils/index.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 void main() {
-  runApp(ProviderScope(child: const MyApp()));
+  runApp(
+     // Provider scope is needed so that riverpod can manage the app
+      ProviderScope(
+          child: const MyApp()
+      ));
 }
 
 class MyApp extends ConsumerWidget {

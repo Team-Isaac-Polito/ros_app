@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:isaac_app/features/control_panel/models/folder/folder.dart';
 
+
+/*
+* This is the card rendered in the control panel page
+* @params:
+*    - element: the element to jump when the card is clicked
+*
+* */
 class ControlPanelCard extends StatelessWidget {
   final Folder element;
   const ControlPanelCard({super.key, required this.element});

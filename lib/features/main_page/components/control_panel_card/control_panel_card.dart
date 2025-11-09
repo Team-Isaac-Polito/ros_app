@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:isaac_app/features/control_panel/models/folder/folder.dart';
-
+import 'package:isaac_app/features/main_page/models/folder/folder.dart';
 
 /*
 * This is the card rendered in the control panel page
@@ -18,9 +17,11 @@ class ControlPanelCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (BuildContext context) {
-            return element.goTopage;
-          }),
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return element.goTopage;
+            },
+          ),
         );
       },
       child: Container(
@@ -30,14 +31,16 @@ class ControlPanelCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
+              margin: const EdgeInsets.symmetric(vertical: 20),
               padding: const EdgeInsets.all(15),
+              width: MediaQuery.of(context).size.width / 4,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 color: Colors.blue,
               ),
               child: Icon(
-                  element.icon,
-                  size: Theme.of(context).textTheme.displayLarge!.fontSize,
+                element.icon,
+                size: Theme.of(context).textTheme.displayLarge!.fontSize,
                 color: Colors.white,
               ),
             ),

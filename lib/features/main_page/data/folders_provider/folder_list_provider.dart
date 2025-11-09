@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/control_panel/models/index.dart';
+import 'package:isaac_app/features/main_page/models/folder/folder.dart';
 import 'package:isaac_app/features/modules_page/index.dart';
 import 'package:isaac_app/features/sensors_page/sensors_page.dart';
 

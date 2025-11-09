@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridge_provider/ros_bridge_provider.dart';
 import 'package:isaac_app/features/main_page/models/index.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 final rosTopicsProvider = AsyncNotifierProvider<RosTopicsNotifier, List<Topic>>(
   RosTopicsNotifier.new,
@@ -11,17 +12,17 @@ final rosTopicsProvider = AsyncNotifierProvider<RosTopicsNotifier, List<Topic>>(
 class RosTopicsNotifier extends AsyncNotifier<List<Topic>> {
   @override
   Future<List<Topic>> build() async {
-    await loadTopics();
-    return [];
+    return await loadTopics();
   }
 
-  Future<void> loadTopics() async {
-    final channel = ref.read(rosBridgeProvider);
-    final stream = ref.read(rosBridgeStreamProvider);
+  Future<List<Topic>> loadTopics() async {
+    final WebSocketChannel channel = ref.read(rosBridgeProvider);
+    final Stream stream = ref.read(rosBridgeStreamProvider);
 
     final completer = Completer<List<Topic>>();
     late final StreamSubscription subscription;
 
+    // ascolta il canale
     subscription = stream.listen((message) {
       try {
         final data = jsonDecode(message);
@@ -29,14 +30,13 @@ class RosTopicsNotifier extends AsyncNotifier<List<Topic>> {
         // Debug: stampa la risposta per capire la struttura
         print('ROS Response: $data');
 
-        // Controlla se è una risposta al servizio topics_and_types
+        // Controlla se è una risposta al servizio /rosapi/topics
         if (data['op'] == 'service_response' &&
-            data['service'] == '/client_count') {
+            data['service'] == '/rosapi/topics') {
           final values = data['values'];
           if (values != null &&
               values['topics'] != null &&
               values['types'] != null) {
-            print("a" + values['topics'] + "\n" + values['types']);
             final topics = (values['topics'] as List).cast<String>();
             final types = (values['types'] as List).cast<String>();
 
@@ -62,20 +62,19 @@ class RosTopicsNotifier extends AsyncNotifier<List<Topic>> {
 
     // Invia la richiesta
     channel.sink.add(
-      jsonEncode({"op": "call_service", "service": "/rosapi/topics", "id": "topics_request_1"}),
+      jsonEncode({
+        "op": "call_service",
+        "service": "/rosapi/topics",
+        "id": "topics_request_1",
+      }),
     );
 
-    try {
-      final list = await completer.future.timeout(
-        Duration(seconds: 5),
-        onTimeout: () {
-          subscription.cancel();
-          throw TimeoutException('Timeout waiting for ROS topics');
-        },
-      );
-      state = AsyncData(list);
-    } catch (e) {
-      state = AsyncError(e, StackTrace.current);
-    }
+    return completer.future.timeout(
+      Duration(seconds: 5),
+      onTimeout: () {
+        subscription.cancel();
+        throw TimeoutException('Timeout waiting for ROS topics');
+      },
+    );
   }
 }

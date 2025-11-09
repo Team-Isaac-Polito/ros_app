@@ -25,7 +25,7 @@ class ControlPanelCard extends StatelessWidget {
         );
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
+        margin: const EdgeInsets.only(right: 20),
         child: Column(
           spacing: 10,
           crossAxisAlignment: CrossAxisAlignment.center,

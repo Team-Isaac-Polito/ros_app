@@ -2,6 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+
 // Provider che gestisce la connessione WebSocket
 final rosBridgeProvider = Provider<WebSocketChannel>((ref) {
   final WebSocketChannel channel = WebSocketChannel.connect(
@@ -13,10 +14,3 @@ final rosBridgeProvider = Provider<WebSocketChannel>((ref) {
 });
 
 
-// Provider per lo stream broadcast
-final rosBridgeStreamProvider = Provider<Stream>((ref) {
-  final WebSocketChannel channel = ref.watch(rosBridgeProvider);
-  // Converti in broadcast stream così può avere multipli listener
-
-  return channel.stream.asBroadcastStream();
-});

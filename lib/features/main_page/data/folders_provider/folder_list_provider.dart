@@ -25,7 +25,7 @@ final folderListProvider = Provider<List<Folder>>(
           ),
           Folder(
               name: "wheels",
-              icon: Icons.wheelchair_pickup,
+              icon: Icons.settings,
               goTopage: Container(),
           ),
           Folder(

@@ -20,7 +20,7 @@ class ModulesPage extends StatelessWidget {
             children: [
               Text("Active modules: 5 su 60"),
               SizedBox(
-                width: MediaQuery.of(context).size.width * 0.3,
+                width: MediaQuery.of(context).size.width,
                 child: ExpansionTile(
                   title: Text('Legenda simboli'),
                   children: <Widget>[

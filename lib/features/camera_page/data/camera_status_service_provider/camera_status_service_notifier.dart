@@ -55,7 +55,7 @@ class CameraNotifier extends AsyncNotifier<CAMERA_MODE> {
     return CAMERA_MODE.values[mode];
   }
 
-  void setCameraCurrentMode(CAMERA_MODE mode) async {
+  Future<void> setCameraCurrentMode(CAMERA_MODE mode) async {
     /* WARNING THIS FUNCTION NEED TO PASS AN INT SO 
     * YOU NEED TO CONVERT FROM CAMERA_MODE TO INT
     */
@@ -64,7 +64,7 @@ class CameraNotifier extends AsyncNotifier<CAMERA_MODE> {
     _channel.sink.add(
       jsonEncode({
         "op": "call_service",
-        "service": "/detection/set_status",
+        "service": "/detection/set_mode",
         "args": {"mode": modeValue},
         "id": "set_mode_request",
       }),

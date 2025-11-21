@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/camera_page/components/camera_switch/camera_switch.dart';
 import 'package:isaac_app/features/camera_page/data/camera_status_service_provider/camera_status_service_notifier.dart';
+import 'package:isaac_app/features/camera_page/models/camera_modes.dart';
 import 'package:isaac_app/utils/palette.dart';
 
 class CameraPage extends ConsumerWidget {
@@ -20,17 +21,39 @@ class CameraPage extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CameraSwitch(cameraNumber: 'Camera 1'),
-                CameraSwitch(cameraNumber: 'Camera 2'),
+                ElevatedButton(
+                  onPressed: () async {
+                    await ref.read(cameraProvider.notifier).setCameraCurrentMode(CAMERA_MODE.INITIALIZING);
+                  },
+                  child: Text("INITIALIZING"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await ref.read(cameraProvider.notifier).setCameraCurrentMode(CAMERA_MODE.MAPPING);
+                  },
+                  child: Text("MAPPING"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await ref.read(cameraProvider.notifier).setCameraCurrentMode(CAMERA_MODE.SENSOR_CRATE);
+                  },
+                  child: Text("SENSOR CRATE"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await ref.read(cameraProvider.notifier).setCameraCurrentMode(CAMERA_MODE.OFF);
+                  },
+                  child: Text("OFF"),
+                ),
               ],
             ),
             camera.when(
               data: (cameraValue) {
                 return Text("Current camera mode: $cameraValue");
               },
-               error: (err, st) => Text(err.toString()),
+              error: (err, st) => Text(err.toString()),
               loading: () => const CircularProgressIndicator(),
-               )
+            ),
           ],
         ),
       ),

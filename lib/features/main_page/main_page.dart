@@ -35,75 +35,6 @@ class _MainPageState extends ConsumerState<MainPage> {
             children: [
               DarkModeSwitcher(),
               SizedBox(height: 16),
-
-              // Form per inviare comandi
-              // Card(
-              //   child: Padding(
-              //     padding: EdgeInsets.all(16),
-              //     child: Column(
-              //       crossAxisAlignment: CrossAxisAlignment.start,
-              //       children: [
-              //         Text(
-              //           'Invia comandi al robot',
-              //           style: Theme.of(context).textTheme.titleMedium,
-              //         ),
-              //         SizedBox(height: 16),
-
-              //         TextField(
-              //           controller: _linearXController,
-              //           decoration: InputDecoration(
-              //             labelText: 'Velocità Lineare (X)',
-              //             border: OutlineInputBorder(),
-              //             hintText: '0.5',
-              //           ),
-              //           keyboardType: TextInputType.numberWithOptions(
-              //             decimal: true,
-              //           ),
-              //         ),
-
-              //         SizedBox(height: 12),
-
-              //         TextField(
-              //           controller: _angularZController,
-              //           decoration: InputDecoration(
-              //             labelText: 'Velocità Angolare (Z)',
-              //             border: OutlineInputBorder(),
-              //             hintText: '0.0',
-              //           ),
-              //           keyboardType: TextInputType.numberWithOptions(
-              //             decimal: true,
-              //           ),
-              //         ),
-
-              //         SizedBox(height: 16),
-
-              //         Row(
-              //           children: [
-              //             Expanded(
-              //               child: ElevatedButton.icon(
-              //                 onPressed: _sendCommand,
-              //                 icon: Icon(Icons.send),
-              //                 label: Text('Invia'),
-              //               ),
-              //             ),
-              //             SizedBox(width: 8),
-              //             ElevatedButton.icon(
-              //               onPressed: _stopRobot,
-              //               icon: Icon(Icons.stop),
-              //               label: Text('Stop'),
-              //               style: ElevatedButton.styleFrom(
-              //                 backgroundColor: Colors.red,
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
-
-              // SizedBox(height: 16),
-
               // Lista dei folders
               SizedBox(
                 height: 200,
@@ -124,13 +55,13 @@ class _MainPageState extends ConsumerState<MainPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Topics disponibili',
+                        'Avaible Topics',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       SizedBox(height: 8),
                       topics.when(
                         data: (list) => list.isEmpty
-                            ? Text('Nessun topic disponibile')
+                            ? Text('No topic avaible')
                             : SizedBox(
                                 height: 300,
                                 child: ListView.builder(
@@ -153,7 +84,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                                               if (!snapshot.hasData) {
                                                 return Padding(
                                                   padding: EdgeInsets.all(8),
-                                                  child: Text("In ascolto..."),
+                                                  child: Text("No message found for now.."),
                                                 );
                                               }
                                               return Padding(
@@ -171,7 +102,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                                   ),
                                 ),
                               ),
-                        error: (err, st) => Text('Errore: ${err.toString()}'),
+                        error: (err, st) => Text('Error: ${err.toString()}'),
                         loading: () =>
                             Center(child: CircularProgressIndicator()),
                       ),

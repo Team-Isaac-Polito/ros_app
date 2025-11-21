@@ -20,9 +20,9 @@ class SensorsPage extends StatelessWidget {
             children: [
               Text("Active sensors: 5 su 60"),
               SizedBox(
-                width: MediaQuery.of(context).size.width * 0.3,
+                width: MediaQuery.of(context).size.width,
                 child: ExpansionTile(
-                  title: Text('Legenda simboli'),
+                  title: Text('Legend'),
                   children: <Widget>[
                     ListTile(
                       leading: Icon(Icons.check, color: Colors.green),

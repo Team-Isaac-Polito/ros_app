@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isaac_app/features/camera_page/camera_page.dart';
 import 'package:isaac_app/features/main_page/models/folder/folder.dart';
 import 'package:isaac_app/features/modules_page/index.dart';
 import 'package:isaac_app/features/sensors_page/sensors_page.dart';
@@ -24,14 +25,14 @@ final folderListProvider = Provider<List<Folder>>(
               goTopage: SensorsPage()
           ),
           Folder(
-              name: "wheels",
-              icon: Icons.settings,
-              goTopage: Container(),
+              name: "Camera",
+              icon: Icons.camera_alt_rounded,
+              goTopage: CameraPage(),
           ),
-          Folder(
-            name: "system",
-            icon: Icons.settings,
-            goTopage: Container(),
-          ),
+          // Folder(
+          //   name: "system",
+          //   icon: Icons.settings,
+          //   goTopage: Container(),
+          // ),
         ]
 );

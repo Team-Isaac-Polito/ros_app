@@ -13,69 +13,51 @@ final rosTopicsProvider = AsyncNotifierProvider<RosTopicsNotifier, List<Topic>>(
 class RosTopicsNotifier extends AsyncNotifier<List<Topic>> {
   @override
   Future<List<Topic>> build() async {
-    return await loadTopics();
+    return loadTopics();
   }
 
   Future<List<Topic>> loadTopics() async {
-    final WebSocketChannel channel = ref.read(rosBridgeProvider);
-    final Stream stream = ref.read(rosBridgeStreamProvider);
-
+    final WebSocketChannel channel = ref.watch(rosBridgeProvider);
+    final Stream<String> stream = ref.read(rosBridgeStreamProvider);
+    // Creiamo un ID univoco per questa specifica chiamata
+    final requestId = "get_topics_${DateTime.now().millisecondsSinceEpoch}";
     final completer = Completer<List<Topic>>();
-    late final StreamSubscription subscription;
+    // Usiamo lo stream già filtrato dal provider per non appesantire la CPU
+    final subscription = stream.listen((message) {
+      final Map<String, dynamic> data = jsonDecode(message);
 
-    // ascolta il canale
-    subscription = stream.listen((message) {
-      try {
-        final data = jsonDecode(message);
+      if (data['op'] == 'service_response' &&
+          data['service'] == '/rosapi/topics' &&
+          data['id'] == requestId) {
+        final Map<String, dynamic> values = data['values'];
+        final List<Topic> result = [];
 
-        // Debug: stampa la risposta per capire la struttura
-        print('ROS Response: $data');
-
-        // Controlla se è una risposta al servizio /rosapi/topics
-        if (data['op'] == 'service_response' &&
-            data['service'] == '/rosapi/topics') {
-          final values = data['values'];
-          if (values != null &&
-              values['topics'] != null &&
-              values['types'] != null) {
-            final topics = (values['topics'] as List).cast<String>();
-            final types = (values['types'] as List).cast<String>();
-
-            final result = List.generate(
-              topics.length,
-              (i) => Topic(topicName: topics[i], topicType: types[i]),
-            );
-
-            if (!completer.isCompleted) {
-              completer.complete(result);
-              subscription.cancel();
-            }
-          }
+        for (int i = 0; i < values['topics'].length; i++) {
+          result.add(
+            Topic(
+              topicName: values['topics'][i],
+              topicType: values['types'][i],
+            ),
+          );
         }
-      } catch (e) {
-        print('Error parsing ROS message: $e');
-        if (!completer.isCompleted) {
-          completer.completeError(e);
-          subscription.cancel();
-        }
+
+        if (!completer.isCompleted) completer.complete(result);
       }
     });
 
-    // Invia la richiesta
     channel.sink.add(
       jsonEncode({
         "op": "call_service",
         "service": "/rosapi/topics",
-        "id": "topics_request_1",
+        "id": requestId, // Usiamo l'ID univoco
       }),
     );
 
-    return completer.future.timeout(
-      Duration(seconds: 5),
-      onTimeout: () {
-        subscription.cancel();
-        throw TimeoutException('Timeout waiting for ROS topics');
-      },
-    );
+    try {
+      return await completer.future.timeout(const Duration(seconds: 5));
+    } finally {
+      // Pulizia: cancelliamo SEMPRE la sottoscrizione, sia in successo che in errore/timeout
+      subscription.cancel();
+    }
   }
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // ignore: must_be_immutable
 class CameraSwitch extends StatefulWidget {
   final String cameraNumber;
-  CameraSwitch({super.key, required this.cameraNumber});
+  const CameraSwitch({super.key, required this.cameraNumber});
 
   @override
   State<CameraSwitch> createState() => _CameraSwitchState();

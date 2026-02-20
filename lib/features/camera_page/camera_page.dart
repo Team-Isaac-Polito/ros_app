@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/camera_page/data/camera_status_service_provider/camera_status_service_notifier.dart';
@@ -48,7 +47,6 @@ class _CameraPageState extends ConsumerState<CameraPage> {
               ),
             ),
           ),
-
           // Controlli
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -68,7 +66,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                     }
                   },
                   icon: Icon(screenshot == null ? Icons.camera : Icons.refresh),
-                  label: Text(screenshot == null ? "Snapshot" : "Live View"),
+                  label: Text("Richiedi screenshot"),
                 ),
               ],
             ),

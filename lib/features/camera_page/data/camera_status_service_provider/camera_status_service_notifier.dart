@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/camera_page/models/camera_modes.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridge_provider/ros_bridge_provider.dart';
@@ -21,7 +20,7 @@ final cameraImageProvider = StreamProvider<String?>((ref) {
         try {
           final data = jsonDecode(event);
           if (data["op"] == "publish" &&
-              data["topic"] == "/camera/image_raw/compressed") {
+              data["topic"] == "/camera/color/image_raw") {
             return data["msg"]["data"] as String;
           }
         } catch (e) {
@@ -72,9 +71,9 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
   Future<void> setMode(CAMERA_MODE value) async {
     state = const AsyncLoading();
     final WebSocketChannel channel = ref.watch(rosBridgeProvider);
-
     try {
       await _callCameraService("/detection/set_mode", {"mode": value.index});
+      state = AsyncData(value);
     } catch (e, st) {
       state = AsyncError(e, st);
     }

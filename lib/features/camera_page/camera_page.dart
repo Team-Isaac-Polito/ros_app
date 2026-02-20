@@ -74,21 +74,27 @@ class _CameraPageState extends ConsumerState<CameraPage> {
             ),
           ),
           cameraState.when(
-            data: (currentMode) => Column(
-              children: CAMERA_MODE.values
-                  .map(
-                    (mode) => ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: currentMode == mode
-                            ? Colors.blue
-                            : null,
+            data: (currentMode) => Container(
+              margin: const EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                spacing: 10,
+                children: CAMERA_MODE.values
+                    .map(
+                      (mode) => ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: currentMode == mode
+                              ? Colors.blue
+                              : null,
+                        ),
+                        onPressed: () =>
+                            ref.read(cameraProvider.notifier).setMode(mode),
+                        child: Text(mode.name),
                       ),
-                      onPressed: () =>
-                          ref.read(cameraProvider.notifier).setMode(mode),
-                      child: Text(mode.name),
-                    ),
-                  )
-                  .toList(),
+                    )
+                    .toList(),
+              ),
             ),
             loading: () => const CircularProgressIndicator(),
             error: (e, _) => Text("Errore: $e"),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isaac_app/features/camera_page/data/manual_screenshot_provider/manual_screenshot_provider.dart';
 import 'package:isaac_app/features/camera_page/models/camera_modes.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridge_provider/ros_bridge_provider.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
@@ -32,6 +33,20 @@ final cameraImageProvider = StreamProvider<String?>((ref) {
 });
 
 class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
+  
+  Future<void> requestScreenshot() async {
+    try {
+      final response = await _callCameraService("/detection/capture_frame", {
+        "quality": 100,
+      });
+      if (response.containsKey("image")) {
+        ref.read(manualScreenShotProvider.notifier).setScreenshot(response["image"] as String);
+      }
+    } catch (e) {
+      print("Errore durante la richiesta di screenshot: $e");
+    }
+  }
+
   Future<Map<String, dynamic>> _callCameraService(
     String service,
     Map<String, dynamic> args,
@@ -42,7 +57,6 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
     final completer = Completer<Map<String, dynamic>>();
     final Stream stream = ref.read(rosBridgeStreamProvider);
     final sub = stream.listen((message) {
-      print("$message");
       final data = jsonDecode(message);
       if (data["op"] == 'service_response' && data["id"] == requestId) {
         completer.complete(data["values"]);

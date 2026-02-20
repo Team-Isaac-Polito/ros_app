@@ -16,7 +16,6 @@ class _CameraPageState extends ConsumerState<CameraPage> {
 
   @override
   Widget build(BuildContext context) {
-    // listen the video for visualizations
     final imageAsync = ref.watch(cameraImageProvider);
     // Listen the mode for buttons and status
     final cameraState = ref.watch(cameraProvider);
@@ -37,7 +36,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                       ) // Mostra lo screenshot
                     : imageAsync.when(
                         data: (base64) => Image.memory(
-                          base64Decode(base64!),
+                          base64Decode(base64 ?? ""),
                           gaplessPlayback: true,
                         ),
                         loading: () => const CircularProgressIndicator(),

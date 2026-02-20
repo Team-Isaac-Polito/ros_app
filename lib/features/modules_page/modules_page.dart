@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:isaac_app/features/sensors_page/components/sensor_card.dart';
 
 class ModulesPage extends StatelessWidget {
   const ModulesPage({super.key});
@@ -39,13 +38,6 @@ class ModulesPage extends StatelessWidget {
                   ],
                 ),
               ),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: List.generate(
-                    5, (index) => SensorCard()
-                ),
-              )
             ],
           ),
         ),

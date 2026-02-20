@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:isaac_app/features/sensors_page/components/sensor_card.dart';
+import 'package:isaac_app/features/sensors_page/components/velocity_sensor/provider/velocity_display/velocity_display.dart';
 
 class SensorsPage extends StatelessWidget {
   const SensorsPage({super.key});
@@ -39,13 +39,7 @@ class SensorsPage extends StatelessWidget {
                   ],
                 ),
               ),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: List.generate(
-                  5, (index) => SensorCard()
-                ),
-              )
+              VelocityDisplay()
             ],
           ),
         ),

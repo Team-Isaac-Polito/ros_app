@@ -11,7 +11,7 @@ class LatencyChartWidget extends ConsumerWidget {
     // final data = ref.watch(latencyChartProvider);
 
     return SfCartesianChart(
-      title: ChartTitle(text: 'Latenza Connessione (ms)'),
+      title: ChartTitle(text: 'Connection Latency (ms)'),
       primaryXAxis: DateTimeAxis(
         isVisible: false, // Nascondiamo le date per pulizia
       ),
@@ -21,11 +21,11 @@ class LatencyChartWidget extends ConsumerWidget {
         plotBands: <PlotBand>[
           // Fascia Gialla (Attenzione)
           PlotBand(
-            start: 150, end: 300, color: Colors.orange.withOpacity(0.1),
+            start: 150, end: 300, color: Colors.orange.withValues(alpha: 0.1),
           ),
           // Fascia Rossa (Critica)
           PlotBand(
-            start: 300, end: 500, color: Colors.red.withOpacity(0.1),
+            start: 300, end: 500, color: Colors.red.withValues(alpha: 0.1),
           ),
         ],
       ),
@@ -35,7 +35,7 @@ class LatencyChartWidget extends ConsumerWidget {
           xValueMapper: (LatencyData d, _) => d.time,
           yValueMapper: (LatencyData d, _) => d.latency,
           name: 'Ping',
-          color: Colors.blue.withOpacity(0.3),
+          color: Colors.blue.withValues(alpha: 0.3),
           borderColor: Colors.blue,
           borderWidth: 2,
           animationDuration: 500, // Rende il movimento fluido

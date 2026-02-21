@@ -26,6 +26,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
     final screenshotNotifier = ref.read(manualScreenShotProvider.notifier);
     // just calculate it one 
     final bool screenshotEmpty = screenshot == "";
+    
     return Scaffold(
       appBar: AppBar(title: const Text("Camera Focus")),
       body: Column(

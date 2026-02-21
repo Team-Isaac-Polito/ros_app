@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/main_page/data/dark_mode_provider/dark_mode_provider.dart';
+import 'package:isaac_app/features/main_page/data/index.dart';
 import 'package:isaac_app/features/main_page/index.dart';
 import 'package:isaac_app/utils/index.dart';
 

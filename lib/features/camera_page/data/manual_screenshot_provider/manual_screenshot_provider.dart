@@ -8,7 +8,7 @@ class ManualScreenshot extends Notifier<String> {
     state = newScreenshot;
   }
 
-  void clearScreenshot(String newScreenshot) {
+  void clearScreenshot() {
     state = "";
   }
 

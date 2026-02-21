@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/camera_page/data/camera_status_service_provider/camera_status_service_notifier.dart';
+import 'package:isaac_app/features/camera_page/data/manual_screenshot_provider/manual_screenshot_provider.dart';
 import 'package:isaac_app/features/camera_page/models/camera_modes.dart';
+import 'package:isaac_app/utils/index.dart';
 
 class CameraPage extends ConsumerStatefulWidget {
   const CameraPage({super.key});
@@ -12,14 +14,18 @@ class CameraPage extends ConsumerStatefulWidget {
 }
 
 class _CameraPageState extends ConsumerState<CameraPage> {
-  String? screenshot;
-
   @override
   Widget build(BuildContext context) {
-    final imageAsync = ref.watch(cameraImageProvider);
     // Listen the mode for buttons and status
     final cameraState = ref.watch(cameraProvider);
-
+    // notifier to access cameraProvider methods
+    final cameraNotifier = ref.read(cameraProvider.notifier);
+    // value of the screenshot
+    final screenshot = ref.watch(manualScreenShotProvider);
+    // notifier to the screenshot methods
+    final screenshotNotifier = ref.read(manualScreenShotProvider.notifier);
+    // just calculate it one 
+    final bool screenshotEmpty = screenshot == "";
     return Scaffold(
       appBar: AppBar(title: const Text("Camera Focus")),
       body: Column(
@@ -30,19 +36,9 @@ class _CameraPageState extends ConsumerState<CameraPage> {
               clipBehavior: Clip.none,
               maxScale: 5.0,
               child: Center(
-                child: screenshot != null
-                    ? Image.memory(
-                        base64Decode(screenshot!),
-                      ) // Mostra lo screenshot
-                    : imageAsync.when(
-                        data: (base64) => Image.memory(
-                          base64Decode(base64 ?? ""),
-                          gaplessPlayback: true,
-                        ),
-                        loading: () => const CircularProgressIndicator(),
-                        error: (e, _) =>
-                            const Icon(Icons.videocam_off, size: 100),
-                      ),
+                child: !screenshotEmpty
+                    ? Image.memory(base64Decode(screenshot))
+                    : Container(color: gray, child: Text("No screenshot")),
               ),
             ),
           ),
@@ -54,17 +50,14 @@ class _CameraPageState extends ConsumerState<CameraPage> {
               children: [
                 ElevatedButton.icon(
                   onPressed: () {
-                    if (screenshot == null) {
+                    if (screenshotEmpty) {
                       // Congela l'ultimo frame
-                      imageAsync.whenData(
-                        (data) => setState(() => screenshot = data),
-                      );
+                      cameraNotifier.requestScreenshot();
                     } else {
-                      // Torna alla live
-                      setState(() => screenshot = null);
+                      screenshotNotifier.clearScreenshot();
                     }
                   },
-                  icon: Icon(screenshot == null ? Icons.camera : Icons.refresh),
+                  icon: Icon(screenshotEmpty ? Icons.camera : Icons.refresh),
                   label: Text("Richiedi screenshot"),
                 ),
               ],

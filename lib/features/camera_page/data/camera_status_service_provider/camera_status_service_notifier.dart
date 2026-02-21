@@ -10,37 +10,18 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 final cameraProvider =
     AsyncNotifierProvider<CameraStatusServiceNotifier, CAMERA_MODE>(
       CameraStatusServiceNotifier.new,
-    );
-
-final cameraImageProvider = StreamProvider<String?>((ref) {
-  // Ascoltiamo il topic dell'immagine compressa (Base64)
-  final rawStream = ref.watch(rosBridgeStreamProvider);
-
-  return rawStream
-      .map((event) {
-        try {
-          final data = jsonDecode(event);
-          if (data["op"] == "publish" &&
-              data["topic"] == "/camera/color/image_raw") {
-            return data["msg"]["data"] as String;
-          }
-        } catch (e) {
-          print("Errore decodifica immagine: $e");
-        }
-        return null;
-      })
-      .where((data) => data != null);
-});
+);
 
 class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
-  
   Future<void> requestScreenshot() async {
     try {
       final response = await _callCameraService("/detection/capture_frame", {
         "quality": 100,
       });
       if (response.containsKey("image")) {
-        ref.read(manualScreenShotProvider.notifier).setScreenshot(response["image"] as String);
+        ref
+            .read(manualScreenShotProvider.notifier)
+            .setScreenshot(response["image"] as String);
       }
     } catch (e) {
       print("Errore durante la richiesta di screenshot: $e");

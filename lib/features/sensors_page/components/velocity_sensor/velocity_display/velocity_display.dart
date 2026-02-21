@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/sensors_page/components/velocity_sensor/provider/velocity_provider/velocity_provider.dart';
 import 'package:isaac_app/features/sensors_page/components/velocity_sensor/velocity_sensor.dart';
 
 class VelocityDisplay extends ConsumerWidget {

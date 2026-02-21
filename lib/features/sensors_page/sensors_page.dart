@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:isaac_app/features/sensors_page/components/velocity_sensor/provider/velocity_display/velocity_display.dart';
+import 'package:isaac_app/features/sensors_page/components/index.dart';
 
 class SensorsPage extends StatelessWidget {
   const SensorsPage({super.key});
@@ -13,33 +13,14 @@ class SensorsPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 10,
+          margin: const EdgeInsets.symmetric(horizontal: 36, vertical: 20),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Active sensors: 5 su 60"),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: ExpansionTile(
-                  title: Text('Legend'),
-                  children: <Widget>[
-                    ListTile(
-                      leading: Icon(Icons.check, color: Colors.green),
-                      title: Text('working ok'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.warning, color: Colors.orange,),
-                      title: Text('Warning'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.offline_bolt, color: Colors.red,),
-                      title: Text('Offline'),
-                    ),
-                  ],
-                ),
-              ),
-              VelocityDisplay()
+              VelocityDisplay(),
+              TemperatureSensor(),
+              LatencyChartWidget()
             ],
           ),
         ),

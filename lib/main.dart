@@ -9,7 +9,8 @@ void main() {
      // Provider scope is needed so that riverpod can manage the app
       ProviderScope(
           child: const MyApp()
-      ));
+      )
+    );
 }
 
 class MyApp extends ConsumerWidget {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+<<<<<<< HEAD
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
@@ -9,12 +10,65 @@ final topicSubscriptionProvider =
       return rawStream.map((event) {
         try {
           final data = jsonDecode(event);
+=======
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
+
+/// A [StreamProvider.family] that creates a dedicated data pipe for a specific ROS 2 topic.
+///
+/// In **Riverpod 3.0**, the `.family` modifier allows for dynamic parameterization.
+/// This provider acts as a high-performance filter that de-multiplexes the global
+/// [rosBridgeStreamProvider] into topic-specific streams.
+///
+/// References:
+/// * Riverpod - Families: https://riverpod.dev/docs/concepts/modifiers/family
+/// * ROS 2 - Topics: https://docs.ros.org/en/foxy/Concepts/About-Topics.html
+/// * Rosbridge Protocol - Subscribe: https://github.com/RobotWebTools/rosbridge_suite/blob/ros2/ROSBRIDGE_PROTOCOL.md
+///
+/// Design Rationale:
+/// * **Selective Listening**: Prevents UI components from rebuilding when data
+///   arrives on topics they are not interested in, optimizing CPU usage on the
+///   control tablet.
+/// * **Type Safety**: Uses [.cast<Map<String, dynamic>>()] to ensure downstream
+///   consumers receive a consistent data structure for ROS message payloads.
+/// * **Memoization**: Riverpod automatically caches the stream for a specific
+///   [topicName], ensuring that multiple widgets watching the same topic share
+///   the same underlying logic.
+final topicSubscriptionProvider = StreamProvider.family<Map<String, dynamic>, String>((
+  ref,
+  topicName,
+) {
+  // Watching the centralized broadcast stream for raw WebSocket packets.
+  final rawStream = ref.watch(rosBridgeStreamProvider);
+
+  return rawStream
+      .map((event) {
+        try {
+          final data = jsonDecode(event);
+
+          // Protocol validation: Check for 'publish' opcode and match the topic identifier.
+>>>>>>> ed34974 (Modifiche a modules_page)
           if (data["op"] == "publish" && data["topic"] == topicName) {
             return data["msg"] as Map<String, dynamic>;
           }
         } catch (e) {
+<<<<<<< HEAD
           print("Eccezione in topicSubscriptionProvider $e");
         }
         return null;
       }).where((data) => data != null).cast<Map<String, dynamic>>();
     });
+=======
+          // Exception handling to prevent the stream from closing on malformed JSON.
+          print(
+            "Exception in topicSubscriptionProvider for topic $topicName: $e",
+          );
+        }
+        return null;
+      })
+      .where(
+        (data) => data != null,
+      ) // Pruning irrelevant traffic for this specific listener.
+      .cast<Map<String, dynamic>>();
+});
+>>>>>>> ed34974 (Modifiche a modules_page)

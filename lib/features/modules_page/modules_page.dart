@@ -8,22 +8,52 @@ class ModulesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: Text("Modules"), centerTitle: true),
-      body: SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 10,
+      appBar: AppBar(title: const Text("Modules"), centerTitle: true),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          int crossAxisCount = constraints.maxWidth < 600 ? 1 : 3;
+
+          return Column(
             children: [
               SymbolLegend(),
-              ModuleCard(
-                moduleName: "Camera termica",
-                icon: Icons.camera_front,
+
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 20,
+                    ),
+                    child: GridView(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.1,
+                      ),
+                      children: const [
+                        ModuleCard(
+                          moduleName: "Camera termica",
+                          icon: Icons.thermostat,
+                          accentColor: Colors.orange,
+                          serviceName: "/ui/thermal",
+                        ),
+                        ModuleCard(
+                          moduleName: "Lidar",
+                          icon: Icons.sensors,
+                          accentColor: Colors.green,
+                          serviceName: "/ui/lidar",
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }

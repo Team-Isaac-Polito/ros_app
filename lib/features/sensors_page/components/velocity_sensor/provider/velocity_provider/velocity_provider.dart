@@ -13,7 +13,11 @@ final velocityProvider = StreamProvider<double?>((ref) {
         return data["msg"]["data"] as double;
       }
     } catch (e) {
+<<<<<<< HEAD
       print("Errore decodifica immagine: $e");
+=======
+      print("Errore decodifica velocita: $e");
+>>>>>>> ed34974 (Modifiche a modules_page)
     }
     return null;
   }).where((data) => data != null);

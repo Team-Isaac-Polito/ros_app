@@ -20,17 +20,28 @@ class ModuleStatusNotifier extends Notifier<bool> {
 
   void toggle(bool enable) {
     final WebSocketChannel channel = ref.watch(rosBridgeProvider);
+<<<<<<< HEAD
     final serviceName = arg;
+=======
+>>>>>>> ed34974 (Modifiche a modules_page)
     state = enable;
 
     channel.sink.add(
       jsonEncode({
         'op': "call_service",
+<<<<<<< HEAD
         "service": serviceName,
         "args": {"data": enable ? "enable" : "disable"},
       }),
     );
 
     print("ROS2: Service $serviceName set to $enable");
+=======
+        "service": arg,
+        "args": {"data": enable},
+      }),
+    );
+    print("ROS2: Service $arg set to $enable");
+>>>>>>> ed34974 (Modifiche a modules_page)
   }
 }

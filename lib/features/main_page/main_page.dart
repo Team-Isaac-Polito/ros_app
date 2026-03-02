@@ -52,7 +52,10 @@ class _MainPageState extends ConsumerState<MainPage> {
               ),
             ),
           ),
+<<<<<<< HEAD
 
+=======
+>>>>>>> ed34974 (Modifiche a modules_page)
           topics.when(
             data: (list) => SliverList(
               delegate: SliverChildBuilderDelegate(

@@ -7,20 +7,14 @@ class ModuleCard extends ConsumerWidget {
   final String moduleName;
   final IconData icon;
   final Color accentColor;
-  final Widget? trailing; // Per metterci un piccolo grafico o un badge
-<<<<<<< HEAD
-
-=======
+  final Widget? trailing;
   final String serviceName;
->>>>>>> ed34974 (Modifiche a modules_page)
+
   const ModuleCard({
     super.key,
     required this.moduleName,
     required this.icon,
-<<<<<<< HEAD
-=======
     required this.serviceName,
->>>>>>> ed34974 (Modifiche a modules_page)
     this.accentColor = Colors.blueAccent,
     this.trailing,
   });
@@ -28,19 +22,14 @@ class ModuleCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = ref.watch(darkModeProvider);
-<<<<<<< HEAD
-    final isEnable = ref.watch(moduleStatusProvider(moduleName));
+    final moduleStatus = ref.watch(moduleStatusProvider(serviceName));
 
-=======
-    final isEnable = ref.watch(moduleStatusProvider(serviceName));
->>>>>>> ed34974 (Modifiche a modules_page)
     return Card(
       elevation: 4,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
         decoration: BoxDecoration(
-          // Sfumatura sottile per dare profondità
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -57,7 +46,6 @@ class ModuleCard extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Icona racchiusa in un cerchio stilizzato
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -72,10 +60,7 @@ class ModuleCard extends ConsumerWidget {
             const SizedBox(height: 20),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-<<<<<<< HEAD
-=======
               spacing: 4,
->>>>>>> ed34974 (Modifiche a modules_page)
               children: [
                 Text(
                   moduleName.toUpperCase(),
@@ -86,22 +71,33 @@ class ModuleCard extends ConsumerWidget {
                     color: isDark ? Colors.white70 : Colors.black87,
                   ),
                 ),
-<<<<<<< HEAD
-                const SizedBox(height: 4),
-=======
->>>>>>> ed34974 (Modifiche a modules_page)
-                // Indicatore di stato ROS2
-                Switch(
-                  value: isEnable,
-                  onChanged: (bool value) {
-<<<<<<< HEAD
-                    ref
-                        .read(moduleStatusProvider(moduleName).notifier)
-                        .toggle(value);
-=======
-                    ref.read(moduleStatusProvider(serviceName).notifier).toggle(value);
->>>>>>> ed34974 (Modifiche a modules_page)
+                // Handle AsyncValue states for robust error handling
+                moduleStatus.when(
+                  // Node status loaded successfully
+                  data: (status) {
+                    final isActive = status == ModuleState.active;
+                    return Switch(
+                      value: isActive,
+                      onChanged: (bool value) {
+                        ref
+                            .read(moduleStatusProvider(serviceName).notifier)
+                            .toggle(value);
+                      },
+                    );
                   },
+                  // Loading state during initialization or toggle operation
+                  loading: () => const SizedBox(
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation(Colors.blue),
+                    ),
+                  ),
+                  // Error state - show disabled switch with error hint
+                  error: (error, stackTrace) => Tooltip(
+                    message: 'Error communicating with node: $error',
+                    child: Switch(value: false, onChanged: null),
+                  ),
                 ),
               ],
             ),

@@ -1,16 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:isaac_app/features/main_page/models/folder/folder.dart';
 
-<<<<<<< HEAD
-/*
-* This is the card rendered in the control panel page
-* @params:
-*    - element: the element to jump when the card is clicked
-*
-* */
-class ControlPanelCard extends StatelessWidget {
-  final Folder element;
-=======
 /// A specialized UI component representing a navigational entry point in the Control Panel.
 ///
 /// This [StatelessWidget] acts as a bridge between the high-level feature overview
@@ -33,18 +23,14 @@ class ControlPanelCard extends StatelessWidget {
   /// The underlying data model containing the icon, name, and destination route.
   final Folder element;
 
->>>>>>> ed34974 (Modifiche a modules_page)
   const ControlPanelCard({super.key, required this.element});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-<<<<<<< HEAD
-=======
         // Navigates to the page defined in the Folder model.
         // MaterialPageRoute handles the platform-specific transition animations.
->>>>>>> ed34974 (Modifiche a modules_page)
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -60,18 +46,6 @@ class ControlPanelCard extends StatelessWidget {
           spacing: 10,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-<<<<<<< HEAD
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 20),
-              padding: const EdgeInsets.all(15),
-              width: MediaQuery.of(context).size.width / 4,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Colors.blue,
-              ),
-              child: Icon(
-                element.icon,
-=======
             // Icon Container: Provides the visual anchor for the module.
             Container(
               margin: const EdgeInsets.symmetric(vertical: 20),
@@ -86,15 +60,11 @@ class ControlPanelCard extends StatelessWidget {
               child: Icon(
                 element.icon,
                 // Inherits size from the primary display text theme for design scaling.
->>>>>>> ed34974 (Modifiche a modules_page)
                 size: Theme.of(context).textTheme.displayLarge!.fontSize,
                 color: Colors.white,
               ),
             ),
-<<<<<<< HEAD
-=======
             // Formatted label retrieved from the Folder model helper.
->>>>>>> ed34974 (Modifiche a modules_page)
             Text(element.formatName(element.name)),
           ],
         ),

@@ -52,16 +52,12 @@ class _MainPageState extends ConsumerState<MainPage> {
               ),
             ),
           ),
-<<<<<<< HEAD
-
-=======
->>>>>>> ed34974 (Modifiche a modules_page)
           topics.when(
             data: (list) => SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, i) => TopicExpansionTile(topic: list[i]),
-                childCount: list.length
-              )
+                childCount: list.length,
+              ),
             ),
             loading: () => const SliverToBoxAdapter(
               child: Center(child: CircularProgressIndicator()),

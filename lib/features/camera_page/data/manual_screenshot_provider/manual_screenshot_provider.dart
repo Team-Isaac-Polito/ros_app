@@ -1,11 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-<<<<<<< HEAD
-final manualScreenShotProvider = NotifierProvider(ManualScreenshot.new);
-
-class ManualScreenshot extends Notifier<String> {
-
-=======
 /// A [NotifierProvider] that holds the state of the most recently captured
 /// high-resolution static frame.
 ///
@@ -32,29 +26,22 @@ class ManualScreenshot extends Notifier<String> {
   ///
   /// This is typically called by the [CameraStatusServiceNotifier] after
   /// a successful '/detection/capture_frame' service response.
->>>>>>> ed34974 (Modifiche a modules_page)
   void setScreenshot(String newScreenshot) {
     state = newScreenshot;
   }
 
-<<<<<<< HEAD
-=======
   /// Resets the screenshot state to an empty string.
   ///
   /// Use this to clear the "Inspection View" and return the UI to a
   /// placeholder or live stream mode.
->>>>>>> ed34974 (Modifiche a modules_page)
   void clearScreenshot() {
     state = "";
   }
 
-<<<<<<< HEAD
-=======
   /// Initializes the provider with an empty string.
   ///
   /// Upon first load, the provider indicates that no manual capture
   /// has been requested yet.
->>>>>>> ed34974 (Modifiche a modules_page)
   @override
   String build() {
     return "";

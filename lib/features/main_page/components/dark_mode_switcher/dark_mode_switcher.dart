@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/dark_mode_provider/dark_mode_provider.dart';
 import 'package:isaac_app/utils/index.dart';
 
-<<<<<<< HEAD
-=======
 /// A specialized UI toggle used to switch between Light and Dark application themes.
 ///
 /// This [ConsumerWidget] subscribes to the [darkModeProvider] to reactively update
@@ -24,22 +22,11 @@ import 'package:isaac_app/utils/index.dart';
 ///   unnecessary rebuild subscriptions.
 /// * **Thematic Consistency**: References global utility constants (like `white`)
 ///   to maintain brand alignment within the AppBar or Settings context.
->>>>>>> ed34974 (Modifiche a modules_page)
 class DarkModeSwitcher extends ConsumerWidget {
   const DarkModeSwitcher({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-<<<<<<< HEAD
-    final isDark = ref.watch(darkModeProvider);
-    return Row(
-      spacing: 20,
-      children: [
-        Text("Dark mode:", style: TextStyle(color: white)),
-        Switch(
-          value: isDark,
-          onChanged: (bool value) {
-=======
     // Listening to the boolean state of the dark mode provider.
     final isDark = ref.watch(darkModeProvider);
 
@@ -54,7 +41,6 @@ class DarkModeSwitcher extends ConsumerWidget {
           value: isDark,
           onChanged: (bool value) {
             // Accessing the notifier's logic layer to persist the change.
->>>>>>> ed34974 (Modifiche a modules_page)
             ref.read(darkModeProvider.notifier).toggleTheme();
           },
         ),

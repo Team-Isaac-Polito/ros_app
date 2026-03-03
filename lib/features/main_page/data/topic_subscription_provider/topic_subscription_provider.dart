@@ -1,16 +1,4 @@
 import 'dart:convert';
-<<<<<<< HEAD
-
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
-
-final topicSubscriptionProvider =
-    StreamProvider.family<Map<String, dynamic>, String>((ref, topicName) {
-      final rawStream = ref.watch(rosBridgeStreamProvider);
-      return rawStream.map((event) {
-        try {
-          final data = jsonDecode(event);
-=======
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
 
@@ -47,18 +35,10 @@ final topicSubscriptionProvider = StreamProvider.family<Map<String, dynamic>, St
           final data = jsonDecode(event);
 
           // Protocol validation: Check for 'publish' opcode and match the topic identifier.
->>>>>>> ed34974 (Modifiche a modules_page)
           if (data["op"] == "publish" && data["topic"] == topicName) {
             return data["msg"] as Map<String, dynamic>;
           }
         } catch (e) {
-<<<<<<< HEAD
-          print("Eccezione in topicSubscriptionProvider $e");
-        }
-        return null;
-      }).where((data) => data != null).cast<Map<String, dynamic>>();
-    });
-=======
           // Exception handling to prevent the stream from closing on malformed JSON.
           print(
             "Exception in topicSubscriptionProvider for topic $topicName: $e",
@@ -71,4 +51,3 @@ final topicSubscriptionProvider = StreamProvider.family<Map<String, dynamic>, St
       ) // Pruning irrelevant traffic for this specific listener.
       .cast<Map<String, dynamic>>();
 });
->>>>>>> ed34974 (Modifiche a modules_page)

@@ -7,14 +7,6 @@ import 'package:isaac_app/features/main_page/data/ros_bridge_provider/ros_bridge
 import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-<<<<<<< HEAD
-final cameraProvider =
-    AsyncNotifierProvider<CameraStatusServiceNotifier, CAMERA_MODE>(
-      CameraStatusServiceNotifier.new,
-);
-
-class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
-=======
 /// An [AsyncNotifier] that manages the operational state and service interactions
 /// of the robot's camera system.
 ///
@@ -43,28 +35,18 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
   /// This method bypasses the live stream to request a specific 'capture_frame'
   /// operation, subsequently updating the [manualScreenShotProvider] with the
   /// returned Base64 image data.
->>>>>>> ed34974 (Modifiche a modules_page)
   Future<void> requestScreenshot() async {
     try {
       final response = await _callCameraService("/detection/capture_frame", {
         "quality": 100,
       });
       if (response.containsKey("image")) {
-<<<<<<< HEAD
-=======
         // Dispatches the received image to the persistent screenshot state.
->>>>>>> ed34974 (Modifiche a modules_page)
         ref
             .read(manualScreenShotProvider.notifier)
             .setScreenshot(response["image"] as String);
       }
     } catch (e) {
-<<<<<<< HEAD
-      print("Errore durante la richiesta di screenshot: $e");
-    }
-  }
-
-=======
       print("Error during screenshot request: $e");
     }
   }
@@ -78,7 +60,6 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
   ///   stream and ensures its disposal via a [finally] block to prevent memory leaks.
   /// * **Fault Tolerance**: Implements a 3-second timeout to handle cases where
   ///   the robot hardware or Rosbridge server is unresponsive.
->>>>>>> ed34974 (Modifiche a modules_page)
   Future<Map<String, dynamic>> _callCameraService(
     String service,
     Map<String, dynamic> args,
@@ -88,11 +69,8 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
         "${service}_${DateTime.now().millisecondsSinceEpoch}";
     final completer = Completer<Map<String, dynamic>>();
     final Stream stream = ref.read(rosBridgeStreamProvider);
-<<<<<<< HEAD
-=======
 
     // Establishing a temporary listener for the specific service response.
->>>>>>> ed34974 (Modifiche a modules_page)
     final sub = stream.listen((message) {
       final data = jsonDecode(message);
       if (data["op"] == 'service_response' && data["id"] == requestId) {
@@ -100,10 +78,7 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
       }
     });
 
-<<<<<<< HEAD
-=======
     // Serializing and dispatching the JSON-RPC call.
->>>>>>> ed34974 (Modifiche a modules_page)
     channel.sink.add(
       jsonEncode({
         "op": "call_service",
@@ -116,33 +91,21 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
     try {
       return await completer.future.timeout(const Duration(seconds: 3));
     } catch (e, stackTrace) {
-<<<<<<< HEAD
-      state = AsyncError(e, stackTrace);
-      return {};
-    } finally {
-=======
       // Propagating errors to the Riverpod state for UI feedback.
       state = AsyncError(e, stackTrace);
       return {};
     } finally {
       // Mandatory cleanup of the transient stream subscription.
->>>>>>> ed34974 (Modifiche a modules_page)
       sub.cancel();
     }
   }
 
-<<<<<<< HEAD
-  Future<void> setMode(CAMERA_MODE value) async {
-    state = const AsyncLoading();
-    final WebSocketChannel channel = ref.watch(rosBridgeProvider);
-=======
   /// Switches the camera operation mode (e.g., MAPPING, THERMAL, OFF).
   ///
   /// Transitions the UI into a loading state during the hardware handshaking
   /// process and updates the [state] upon successful confirmation from ROS 2.
   Future<void> setMode(CAMERA_MODE value) async {
     state = const AsyncLoading();
->>>>>>> ed34974 (Modifiche a modules_page)
     try {
       await _callCameraService("/detection/set_mode", {"mode": value.index});
       state = AsyncData(value);
@@ -151,10 +114,7 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
     }
   }
 
-<<<<<<< HEAD
-=======
   /// Initializes the provider by fetching the current hardware status from the robot.
->>>>>>> ed34974 (Modifiche a modules_page)
   @override
   Future<CAMERA_MODE> build() async {
     final res = await _callCameraService("/detection/get_status", {});

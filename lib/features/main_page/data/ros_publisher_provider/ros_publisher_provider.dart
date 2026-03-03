@@ -3,9 +3,6 @@ import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros
 import 'package:isaac_app/features/main_page/models/ros_publisher/ros_publisher.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-<<<<<<< HEAD
-
-=======
 /// A [Provider.family] that acts as a Factory for the [RosPublisher] domain model.
 ///
 /// In **Riverpod 3.0**, this implementation follows the **Logic Injection** pattern.
@@ -26,20 +23,15 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 /// * **Reactivity**: Utilizing [ref.watch] ensures that if the centralized
 ///   stream resets (e.g., on reconnection), the [RosPublisher] automatically
 ///   receives the updated data pipe without manual intervention.
->>>>>>> ed34974 (Modifiche a modules_page)
 final rosPublisherProvider = Provider.family<RosPublisher, WebSocketChannel>((
   ref,
   WebSocketChannel channel,
 ) {
-<<<<<<< HEAD
-  final Stream<String> stream = ref.watch(rosBridgeStreamProvider);
-=======
   // Watching the global stream provider to ensure the publisher
   // has access to real-time broadcast data.
   final Stream<String> stream = ref.watch(rosBridgeStreamProvider);
 
   // Returning a specialized instance that handles the protocol-level
   // logic of publishing and subscribing.
->>>>>>> ed34974 (Modifiche a modules_page)
   return RosPublisher(channel, stream);
 });

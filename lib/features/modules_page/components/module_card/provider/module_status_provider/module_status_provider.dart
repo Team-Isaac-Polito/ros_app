@@ -1,8 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/index.dart';
-import 'package:isaac_app/features/modules_page/components/module_card/provider/module_status_provider/data/enum/modul_state.dart';
 import 'package:isaac_app/features/modules_page/components/module_card/provider/number_of_active_modules_provider/number_of_active_module_provider.dart';
 import 'package:isaac_app/features/modules_page/components/module_card/provider/number_of_modules_provider/number_of_module_provider.dart';
+
+/// Represents the state of a ROS 2 sensor node.
+/// - [active]: Node is running on the robot
+/// - [inactive]: Node is not running on the robot
+enum ModuleState { active, inactive }
 
 /// AsyncNotifierProvider that manages dynamic startup/shutdown of ROS 2 nodes
 /// (thermal camera, LiDAR, etc.) per app request.

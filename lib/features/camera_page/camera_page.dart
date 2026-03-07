@@ -87,7 +87,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                     .toList(),
               ),
             ),
-            loading: () => const CircularProgressIndicator(),
+            loading: () => Center(child: const CircularProgressIndicator()),
             error: (e, _) => Text("Errore: $e"),
           ),
         ],

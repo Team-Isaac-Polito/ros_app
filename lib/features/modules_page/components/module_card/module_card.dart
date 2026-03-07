@@ -89,9 +89,13 @@ class ModuleCard extends ConsumerWidget {
                   // Loading state during initialization or toggle operation
                   loading: () => const SizedBox(
                     height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation(Colors.blue),
+                    child: Center(
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation(Colors.blue),
+                        ),
+                      ),
                     ),
                   ),
                   // Error state - show disabled switch with error hint

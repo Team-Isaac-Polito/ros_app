@@ -20,7 +20,7 @@ final rosBridgeProvider = Provider<WebSocketChannel>((ref) {
   // Establishing connection to the Rosbridge WebSocket server.
   // Standard port is 9090. Use 'ws://' for unencrypted or 'wss://' for secure sockets.
   final WebSocketChannel channel = WebSocketChannel.connect(
-    Uri.parse("ws://localhost:9090"),
+    Uri.parse("ws://127.0.0.1:9090"),
   );
 
   // According to Riverpod Documentation (https://riverpod.dev/docs/concepts/modifiers/on_dispose),

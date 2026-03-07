@@ -51,14 +51,12 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
 
     final response = await helper.call(
       service: serviceName,
-      args: {"data": "get_status"},
+      args: {"status": "query"},
       timeout: const Duration(seconds: 3),
     );
 
-    final statusStr = response['status'] as String? ?? 'inactive';
-    return statusStr.toLowerCase() == 'active'
-        ? ModuleState.active
-        : ModuleState.inactive;
+    final isRunning = response['success'] as bool? ?? false;
+    return isRunning ? ModuleState.active : ModuleState.inactive;
   }
 
   /// Activate or deactivate the node with deterministic error handling.
@@ -75,7 +73,7 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
       // Send start/stop command to robot
       final response = await helper.call(
         service: serviceName,
-        args: {"data": enable ? "start" : "stop"},
+        args: {"status": enable ? "enable" : "disable"},
         timeout: const Duration(seconds: 5),
       );
 
@@ -97,7 +95,7 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
           "ROS2: Node $serviceName ${enable ? 'started' : 'stopped'} successfully",
         );
       } else {
-        final errorMsg = response['error'] as String? ?? 'Unknown error';
+        final errorMsg = response['message'] as String? ?? 'Unknown error';
         state = AsyncValue.error(
           Exception('Node operation failed: $errorMsg'),
           StackTrace.current,

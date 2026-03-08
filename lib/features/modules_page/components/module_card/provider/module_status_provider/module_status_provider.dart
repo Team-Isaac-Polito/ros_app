@@ -1,8 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/index.dart';
-import 'package:isaac_app/features/modules_page/components/module_card/provider/number_of_active_modules_provider/number_of_active_module_provider.dart';
-import 'package:isaac_app/features/modules_page/components/module_card/provider/number_of_modules_in_error/number_ofmodules_in_error.dart';
-import 'package:isaac_app/features/modules_page/components/module_card/provider/number_of_modules_provider/number_of_module_provider.dart';
 
 /// Represents the state of a ROS 2 sensor node.
 /// - [active]: Node is running on the robot
@@ -33,19 +30,8 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
   /// This ensures the UI reflects reality, not assumptions.
   @override
   Future<ModuleState> build() async {
-    Future.microtask(() {
-      ref.read(numberOfModulesProvider.notifier).increment();
-    });
-
     try {
-      final ModuleState status = await _queryNodeStatus();
-
-      if (status == ModuleState.active) {
-        Future.microtask(() {
-          ref.read(numberOfActiveModulesProvider.notifier).increment();
-        });
-      }
-      return status;
+      return await _queryNodeStatus();
     } catch (e) {
       print("Error querying node status for $serviceName: $e");
       return ModuleState.inactive;
@@ -63,8 +49,17 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
       timeout: const Duration(seconds: 3),
     );
 
-    final isRunning = response['success'] as bool? ?? false;
-    return isRunning ? ModuleState.active : ModuleState.inactive;
+    if (response['success'] == true) {
+      final String allStatuses = response['message'] ?? "";
+      // Esempio: "thermal: RUNNING"
+      // Cerchiamo se il nostro serviceName (es: /ui/thermal) è RUNNING
+      final myId = serviceName.split('/').last; // ottiene "thermal"
+      
+      if (allStatuses.contains('$myId: RUNNING')) {
+        return ModuleState.active;
+      }
+    }
+    return ModuleState.inactive;
   }
 
   /// Activate or deactivate the node with deterministic error handling.
@@ -73,7 +68,6 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
   /// - "Clean startup/shutdown avoiding orphan processes"
   /// - "Stable communication during dynamic activation"
   Future<void> toggle(bool enable) async {
-    final previousState = state.value;
     try {
       state = const AsyncValue.loading();
 
@@ -90,27 +84,17 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
       if (success) {
         final newState = enable ? ModuleState.active : ModuleState.inactive;
         state = AsyncValue.data(newState);
-
-        final nActiveModules = ref.read(numberOfActiveModulesProvider.notifier);
-        if (enable && previousState != ModuleState.active) {
-          nActiveModules.increment();
-        } else if (!enable && previousState == ModuleState.active) {
-          nActiveModules.decrement();
-        }
         print(
           "ROS2: Node $serviceName ${enable ? 'started' : 'stopped'} successfully",
         );
       } else {
         final errorMsg = response['message'] as String? ?? 'Unknown error';
-        ref.read(numberOfModulesInErrorProvider.notifier).increment();
         state = AsyncValue.error(
           Exception('Node operation failed: $errorMsg'),
           StackTrace.current,
         );
       }
     } catch (e, st) {
-      final nErrorNotifier = ref.read(numberOfModulesInErrorProvider.notifier);
-      nErrorNotifier.increment();
       state = AsyncValue.error(e, st);
       print("Error during node toggle for $serviceName: $e");
     }

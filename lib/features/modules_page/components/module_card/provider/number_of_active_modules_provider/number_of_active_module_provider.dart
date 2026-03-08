@@ -1,22 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isaac_app/features/modules_page/components/module_card/provider/module_list_provider/module_list_provider.dart';
+import 'package:isaac_app/features/modules_page/components/module_card/provider/module_status_provider/module_status_provider.dart';
 
-final numberOfActiveModulesProvider = NotifierProvider<NumberOfActiveModule, int>(
-  NumberOfActiveModule.new
-);
+final numberOfActiveModulesProvider = Provider<int>((ref) {
+  final modulesAsync = ref.watch(moduleListProvider);
 
-class NumberOfActiveModule extends Notifier<int> {
-  void increment() {
-    state++;
-  }
-
-  void decrement() {
-    if (state > 0) {
-      state--;
-    }
-  }
-
-  @override
-  int build() {
-    return 0;
-  }
-}
+  return modulesAsync.maybeWhen(
+    data: (services) {
+      int count = 0;
+      for (final service in services) {
+        final status = ref.watch(moduleStatusProvider(service)).value;
+        if (status == ModuleState.active) {
+          count++;
+        }
+      }
+      return count;
+    },
+    orElse: () => 0,
+  );
+});

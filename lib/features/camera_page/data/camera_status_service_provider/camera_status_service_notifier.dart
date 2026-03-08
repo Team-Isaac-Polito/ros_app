@@ -71,10 +71,21 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
     final Stream stream = ref.read(rosBridgeStreamProvider);
 
     // Establishing a temporary listener for the specific service response.
-    final sub = stream.listen((message) {
-      final data = jsonDecode(message);
-      if (data["op"] == 'service_response' && data["id"] == requestId) {
-        completer.complete(data["values"]);
+    final StreamSubscription? sub = stream.listen((message) {
+      try {
+        final data = jsonDecode(message);
+
+        if (data["op"] == 'service_response' && data["id"] == requestId) {
+          final values = data["values"];
+          if (values is Map) {
+            completer.complete(Map<String, dynamic>.from(values));
+          } else {
+            print("ROS Service Error: $values");
+            completer.complete({});
+          }
+        }
+      } catch (e) {
+        print(e);
       }
     });
 
@@ -96,7 +107,7 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
       return {};
     } finally {
       // Mandatory cleanup of the transient stream subscription.
-      sub.cancel();
+      sub!.cancel();
     }
   }
 

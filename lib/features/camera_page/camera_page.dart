@@ -24,9 +24,9 @@ class _CameraPageState extends ConsumerState<CameraPage> {
     final screenshot = ref.watch(manualScreenShotProvider);
     // notifier to the screenshot methods
     final screenshotNotifier = ref.read(manualScreenShotProvider.notifier);
-    // just calculate it one 
+    // just calculate it one
     final bool screenshotEmpty = screenshot == "";
-    
+
     return Scaffold(
       appBar: AppBar(title: const Text("Camera Focus")),
       body: Column(
@@ -65,30 +65,63 @@ class _CameraPageState extends ConsumerState<CameraPage> {
             ),
           ),
           cameraState.when(
-            data: (currentMode) => Container(
-              margin: const EdgeInsets.all(10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                spacing: 10,
-                children: CAMERA_MODE.values
-                    .map(
-                      (mode) => ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: currentMode == mode
-                              ? Colors.blue
-                              : null,
-                        ),
-                        onPressed: () =>
-                            ref.read(cameraProvider.notifier).setMode(mode),
-                        child: Text(mode.name),
+            data: (currentMode) {
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: GridView.builder(
+                      // Fondamentale: permette al GridView di stare dentro la Column
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: CAMERA_MODE.values.length,
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent:
+                            150, // Larghezza massima di ogni bottone
+                        mainAxisSpacing: 10, // Spazio verticale tra bottoni
+                        crossAxisSpacing: 10, // Spazio orizzontale tra bottoni
+                        childAspectRatio:
+                            2.5, // Rapporto larghezza/altezza (più alto = più sottile)
                       ),
-                    )
-                    .toList(),
-              ),
+                      itemBuilder: (context, index) {
+                        final mode = CAMERA_MODE.values[index];
+                        final isSelected = currentMode == mode;
+                    
+                        return ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isSelected ? Colors.blue : null,
+                            foregroundColor: isSelected ? Colors.white : null,
+                            padding: EdgeInsets
+                                .zero, // Per evitare ritagli su schermi piccoli
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () =>
+                              ref.read(cameraProvider.notifier).setMode(mode),
+                          child: Text(
+                            mode.name.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              );
+            },
+            loading: () => const Padding(
+              padding: EdgeInsets.all(20),
+              child: CircularProgressIndicator(),
             ),
-            loading: () => Center(child: const CircularProgressIndicator()),
-            error: (e, _) => Text("Errore: $e"),
+            error: (e, tr) => Text("Errore: $e"),
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/index.dart';
+import 'package:isaac_app/features/modules_page/components/module_card/provider/index.dart';
 import 'package:isaac_app/features/modules_page/components/module_card/provider/module_status_provider/data/enum/modul_state.dart';
 import 'package:isaac_app/features/modules_page/components/module_card/provider/module_status_provider/module_status_provider.dart' hide ModuleState;
 
@@ -90,18 +91,19 @@ class ModuleCard extends ConsumerWidget {
                   loading: () => const SizedBox(
                     height: 24,
                     child: Center(
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(Colors.blue),
-                        ),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation(Colors.blue),
                       ),
                     ),
                   ),
-                  // Error state - show disabled switch with error hint
-                  error: (error, stackTrace) => Tooltip(
-                    message: 'Error communicating with node: $error',
-                    child: Switch(value: false, onChanged: null),
+                  error: (error, stackTrace) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 10,
+                    children: [
+                      Icon(Icons.warning),
+                      Text('Error communicating with node: $error'),
+                    ],
                   ),
                 ),
               ],

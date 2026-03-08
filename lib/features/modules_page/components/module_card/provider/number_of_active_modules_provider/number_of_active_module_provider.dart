@@ -1,16 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final numberOfActiveModulesProvider = NotifierProvider(
-  NumberOfActiveModuleProvider.new
+final numberOfActiveModulesProvider = NotifierProvider<NumberOfActiveModule, int>(
+  NumberOfActiveModule.new
 );
 
-class NumberOfActiveModuleProvider extends Notifier<int> {
+class NumberOfActiveModule extends Notifier<int> {
   void increment() {
     state++;
   }
 
   void decrement() {
-    state--;
+    if (state > 0) {
+      state--;
+    }
   }
 
   @override

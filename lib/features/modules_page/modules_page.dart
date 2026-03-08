@@ -24,15 +24,15 @@ class ModulesPage extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 20,
             children: [
-              Text("Active: $nActive / $nTotal"),
+              Text("Active:  $nActive / $nTotal"),
               Expanded(
                 child: GridView.builder(
                   itemCount: services.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 300,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
-                    childAspectRatio: 2,
+                    childAspectRatio: 0.85,
                   ),
                   itemBuilder: (context, index) {
                     final service = services[index];

@@ -4,8 +4,12 @@ ros2 launch reseq_ros2 reseq_launch.py config_file:=reseq_mk1_vcan.yaml
 in un altro terminale:
 ros2 launch rosbridge_server rosbridge_websocket_launch.xml
 <<<<<<< HEAD
+<<<<<<< HEAD
 in un altro ancora:
 =======
 in un altro ancora (opzionale) per lanciare la computer vision:
 >>>>>>> d16943f (fix: fix modules number providers)
+=======
+in un altro ancora (opzionale) per lanciare la computer vision:
+>>>>>>> 35477f5 (fix: made card better responsive)
 ros2 launch computer_vision cv_launch.py mode:=3

@@ -1,10 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/ros_service_call_helper/ros_service_call_helper.dart';
 
-final moduleListProvider =
-    AsyncNotifierProvider<ModuleListNotifier, List<String>>(
+final moduleListProvider = AsyncNotifierProvider<ModuleListNotifier, List<String>>(
       ModuleListNotifier.new,
-    );
+);
 
 class ModuleListNotifier extends AsyncNotifier<List<String>> {
   @override

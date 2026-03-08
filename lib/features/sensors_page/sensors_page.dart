@@ -7,23 +7,20 @@ class SensorsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          title: Text("Sensors"),
-          centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 36, vertical: 20),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              VelocityDisplay(),
-              TemperatureSensor(),
-              LatencyChartWidget()
-            ],
-          ),
+      appBar: AppBar(title: Text("Sensors"), centerTitle: true),
+      body: GridView(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 450,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.85,
         ),
+        children: [
+          VelocityDisplay(),
+          TemperatureSensor(),
+          LatencyChartWidget(),
+        ],
       ),
     );
   }

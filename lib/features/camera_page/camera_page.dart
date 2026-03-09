@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/camera_page/data/camera_status_service_provider/camera_status_service_notifier.dart';
 import 'package:isaac_app/features/camera_page/data/manual_screenshot_provider/manual_screenshot_provider.dart';
@@ -66,53 +67,91 @@ class _CameraPageState extends ConsumerState<CameraPage> {
           ),
           cameraState.when(
             data: (currentMode) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 600),
-                    child: GridView.builder(
-                      // Fondamentale: permette al GridView di stare dentro la Column
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: CAMERA_MODE.values.length,
-                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent:
-                            150, // Larghezza massima di ogni bottone
-                        mainAxisSpacing: 10, // Spazio verticale tra bottoni
-                        crossAxisSpacing: 10, // Spazio orizzontale tra bottoni
-                        childAspectRatio:
-                            2.5, // Rapporto larghezza/altezza (più alto = più sottile)
-                      ),
-                      itemBuilder: (context, index) {
-                        final mode = CAMERA_MODE.values[index];
-                        final isSelected = currentMode == mode;
-                    
-                        return ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isSelected ? Colors.blue : null,
-                            foregroundColor: isSelected ? Colors.white : null,
-                            padding: EdgeInsets
-                                .zero, // Per evitare ritagli su schermi piccoli
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          onPressed: () =>
-                              ref.read(cameraProvider.notifier).setMode(mode),
-                          child: Text(
-                            mode.name.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: CAMERA_MODE.values.length,
+                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent:
+                          150, // Larghezza massima di ogni bottone
+                      mainAxisSpacing: 10, // Spazio verticale tra bottoni
+                      crossAxisSpacing: 10, // Spazio orizzontale tra bottoni
+                      childAspectRatio:
+                          2.5, // Rapporto larghezza/altezza (più alto = più sottile)
                     ),
+                    itemBuilder: (context, index) {
+                      final mode = CAMERA_MODE.values[index];
+                      final isSelected = currentMode == mode;
+
+                      return Focus(
+                        onKeyEvent: (node, event) {
+                          if (event is KeyDownEvent &&
+                              (event.logicalKey == LogicalKeyboardKey.enter ||
+                                  event.logicalKey ==
+                                      LogicalKeyboardKey.gameButtonA)) {
+                                      ref.read(cameraProvider.notifier).setMode(mode);
+                            return KeyEventResult.handled;
+                          }
+                          return KeyEventResult.ignored;
+                        },
+                        child: Builder(
+                          builder: (context) {
+                            final bool isFocused = Focus.of(context).hasFocus;
+                            return AnimatedContainer(
+                              duration: const Duration(seconds: 2),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                // Feedback visivo del focus
+                                border: Border.all(
+                                  color: isFocused
+                                      ? Colors.blue.withValues(alpha: 0.8)
+                                      : Colors.transparent,
+                                  width: 3,
+                                ),
+                                boxShadow: isFocused
+                                    ? [
+                                        BoxShadow(
+                                          color: Colors.blue.withValues(
+                                            alpha: 0.1,
+                                          ),
+                                          blurRadius: 15,
+                                        ),
+                                      ]
+                                    : [],
+                              ),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isSelected
+                                      ? Colors.blue
+                                      : null,
+                                  foregroundColor: isSelected
+                                      ? Colors.white
+                                      : null,
+                                  padding: EdgeInsets
+                                      .zero, // Per evitare ritagli su schermi piccoli
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                onPressed: () => ref
+                                    .read(cameraProvider.notifier)
+                                    .setMode(mode),
+                                child: Text(
+                                  mode.name.toUpperCase(),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ),
               );

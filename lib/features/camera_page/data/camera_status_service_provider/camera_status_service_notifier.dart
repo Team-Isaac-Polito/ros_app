@@ -24,8 +24,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 ///   stream events into a linear [Future] based on unique request IDs.
 /// * **State Consistency**: Updates the provider's [state] only after successful
 ///   hardware confirmation from the ROS 2 service response.
-final cameraProvider =
-    AsyncNotifierProvider<CameraStatusServiceNotifier, CAMERA_MODE>(
+final cameraProvider = AsyncNotifierProvider<CameraStatusServiceNotifier, CAMERA_MODE>(
       CameraStatusServiceNotifier.new,
     );
 
@@ -42,9 +41,7 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
       });
       if (response.containsKey("image")) {
         // Dispatches the received image to the persistent screenshot state.
-        ref
-            .read(manualScreenShotProvider.notifier)
-            .setScreenshot(response["image"] as String);
+        ref.read(manualScreenShotProvider.notifier).setScreenshot(response["image"] as String);
       }
     } catch (e) {
       print("Error during screenshot request: $e");

@@ -28,7 +28,11 @@ final folderListProvider = Provider<List<Folder>>(
       icon: Icons.extension,
       goTopage: const ModulesPage(),
     ),
-    Folder(name: "sensors", icon: Icons.sensors, goTopage: const SensorsPage()),
+    Folder(
+      name: "sensors", 
+      icon: Icons.sensors, 
+      goTopage: const SensorsPage()
+    ),
     Folder(
       name: "Camera",
       icon: Icons.camera_alt_rounded,

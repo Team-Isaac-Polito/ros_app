@@ -1,13 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/camera_page/data/manual_screenshot_provider/manual_screenshot_provider.dart';
 import 'package:isaac_app/features/camera_page/models/camera_modes.dart';
-import 'package:isaac_app/features/main_page/data/ros_bridge_provider/ros_bridge_provider.dart';
-import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
 import 'package:isaac_app/features/main_page/data/ros_publisher_provider/ros_publisher_provider.dart';
 import 'package:isaac_app/features/main_page/models/ros_bridge_client/ros_bridge_client.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 /// An [AsyncNotifier] that manages the operational state and service interactions
 /// of the robot's camera system.

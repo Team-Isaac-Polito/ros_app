@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/main_page/components/control_panel_card/control_panel_card.dart';
 import 'package:isaac_app/features/main_page/components/index.dart';
-import 'package:isaac_app/features/main_page/components/topic_expansion_tile/topic_expansion_tile.dart';
 import 'package:isaac_app/features/main_page/data/folders_provider/folder_list_provider.dart';
 import 'package:isaac_app/features/main_page/data/ros_topics_notifier/ros_topics_notifier.dart';
 
@@ -26,7 +24,10 @@ class _MainPageState extends ConsumerState<MainPage> {
         slivers: [
           SliverAppBar.large(
             title: const Text("ISAAC Dashboard"),
-            actions: [const DarkModeSwitcher()],
+            actions: [
+              const DarkModeSwitcher(),
+              const RefreshSocketConnection(),
+              ],
           ),
           SliverPadding(
             padding: const EdgeInsets.all(18),

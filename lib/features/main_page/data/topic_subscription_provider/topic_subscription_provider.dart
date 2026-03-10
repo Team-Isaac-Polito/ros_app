@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
+import 'package:isaac_app/features/main_page/data/ros_publisher_provider/ros_publisher_provider.dart';
 
 /// A [StreamProvider.family] that creates a dedicated data pipe for a specific ROS 2 topic.
 ///
@@ -27,27 +27,7 @@ final topicSubscriptionProvider = StreamProvider.family<Map<String, dynamic>, St
   topicName,
 ) {
   // Watching the centralized broadcast stream for raw WebSocket packets.
-  final rawStream = ref.watch(rosBridgeStreamProvider);
+  final rosClient = ref.watch(rosBridgeClientProvider);
 
-  return rawStream
-      .map((event) {
-        try {
-          final data = jsonDecode(event);
-
-          // Protocol validation: Check for 'publish' opcode and match the topic identifier.
-          if (data["op"] == "publish" && data["topic"] == topicName) {
-            return data["msg"] as Map<String, dynamic>;
-          }
-        } catch (e) {
-          // Exception handling to prevent the stream from closing on malformed JSON.
-          print(
-            "Exception in topicSubscriptionProvider for topic $topicName: $e",
-          );
-        }
-        return null;
-      })
-      .where(
-        (data) => data != null,
-      ) // Pruning irrelevant traffic for this specific listener.
-      .cast<Map<String, dynamic>>();
+  return rosClient.subscribe(topicName);
 });

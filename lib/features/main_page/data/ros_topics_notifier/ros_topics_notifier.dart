@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/main_page/data/ros_bridge_provider/ros_bridge_provider.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
+import 'package:isaac_app/features/main_page/data/ros_publisher_provider/ros_publisher_provider.dart';
 import 'package:isaac_app/features/main_page/models/index.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 /// An [AsyncNotifierProvider] that manages the discovery of active ROS 2 topics.
 ///
@@ -46,50 +44,28 @@ class RosTopicsNotifier extends AsyncNotifier<List<Topic>> {
   /// * **Timeout Protection**: Enforces a 5-second execution limit to prevent
   ///   the UI from hanging if the Rosbridge server fails to acknowledge the request.
   Future<List<Topic>> loadTopics() async {
-    final WebSocketChannel channel = ref.watch(rosBridgeProvider);
+    final rosClient = ref.watch(rosBridgeClientProvider);
     final Stream<String> stream = ref.read(rosBridgeStreamProvider);
-
     final requestId = "get_topics_${DateTime.now().millisecondsSinceEpoch}";
     final completer = Completer<List<Topic>>();
-
     // Listening to the centralized stream for the service response opcode.
-    final subscription = stream.listen((message) {
-      final Map<String, dynamic> data = jsonDecode(message);
-
-      if (data['op'] == 'service_response' &&
-          data['service'] == '/rosapi/topics' &&
-          data['id'] == requestId) {
-        final Map<String, dynamic> values = data['values'];
-        final List<Topic> result = [];
-
-        // Parallel processing of ROS 2 topic names and their respective message types.
-        for (int i = 0; i < values['topics'].length; i++) {
-          result.add(
-            Topic(
-              topicName: values['topics'][i],
-              topicType: values['types'][i],
-            ),
-          );
-        }
-
-        if (!completer.isCompleted) completer.complete(result);
-      }
-    });
-
-    // Dispatching the service request to the Rosbridge server.
-    channel.sink.add(
-      jsonEncode({
-        "op": "call_service",
-        "service": "/rosapi/topics",
-        "id": requestId,
-      }),
+    final response = await rosClient.callService(
+      service: "/rosapi/topics", 
+      timeout: const Duration(seconds: 5),
     );
 
-    try {
-      return await completer.future.timeout(const Duration(seconds: 5));
-    } finally {
-      // Cleanup: Mandatory cancellation of the stream listener to free resources.
-      subscription.cancel();
+    final List<dynamic> names = response['topics'] ?? [];
+    final List<dynamic> types = response['types'] ?? [];
+    final List<Topic> result = [];
+
+    for (int i = 0; i < names.length; i++) {
+      result.add(
+        Topic(
+          topicName: names[i] as String,
+          topicType: types[i] as String,
+        ),
+      );
     }
+    return result;
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/modules_page/components/index.dart';
-import 'package:isaac_app/features/modules_page/components/module_card/provider/index.dart';
-import 'package:isaac_app/features/modules_page/components/module_card/provider/module_list_provider/module_list_provider.dart';
+import 'package:isaac_app/features/modules_page/provider/index.dart';
+import 'package:isaac_app/features/modules_page/provider/module_list_provider/module_list_provider.dart';
 
 class ModulesPage extends ConsumerWidget {
   const ModulesPage({super.key});

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/index.dart';
-import 'package:isaac_app/features/modules_page/components/module_card/provider/module_status_provider/data/enum/modul_state.dart';
-import 'package:isaac_app/features/modules_page/components/module_card/provider/module_status_provider/module_status_provider.dart'
+import 'package:isaac_app/features/modules_page/provider/module_status_provider/data/enum/modul_state.dart';
+import 'package:isaac_app/features/modules_page/provider/module_status_provider/module_status_provider.dart'
     hide ModuleState;
 
 class ModuleCard extends ConsumerWidget {

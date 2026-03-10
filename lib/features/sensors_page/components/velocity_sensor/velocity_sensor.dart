@@ -26,22 +26,22 @@ class VelocitySensor extends ConsumerWidget {
                   axes: <RadialAxis>[
                     RadialAxis(
                       minimum: 0,
-                      maximum: 150,
+                      maximum: 0.25,
                       showLabels: constraints.maxWidth > 200,
                       ranges: <GaugeRange>[
                         GaugeRange(
                           startValue: 0,
-                          endValue: 50,
+                          endValue: 0.3,
                           color: Colors.green,
                         ),
                         GaugeRange(
-                          startValue: 50,
-                          endValue: 100,
+                          startValue: 0.8,
+                          endValue: 0.17,
                           color: Colors.orange,
                         ),
                         GaugeRange(
-                          startValue: 100,
-                          endValue: 150,
+                          startValue: 0.18,
+                          endValue: 0.25,
                           color: Colors.red,
                         ),
                       ],

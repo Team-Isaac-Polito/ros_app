@@ -5,6 +5,8 @@ import 'package:isaac_app/features/camera_page/data/manual_screenshot_provider/m
 import 'package:isaac_app/features/camera_page/models/camera_modes.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridge_provider/ros_bridge_provider.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
+import 'package:isaac_app/features/main_page/data/ros_publisher_provider/ros_publisher_provider.dart';
+import 'package:isaac_app/features/main_page/models/ros_bridge_client/ros_bridge_client.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 /// An [AsyncNotifier] that manages the operational state and service interactions
@@ -24,87 +26,28 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 ///   stream events into a linear [Future] based on unique request IDs.
 /// * **State Consistency**: Updates the provider's [state] only after successful
 ///   hardware confirmation from the ROS 2 service response.
-final cameraProvider = AsyncNotifierProvider<CameraStatusServiceNotifier, CAMERA_MODE>(
+final cameraProvider =
+    AsyncNotifierProvider<CameraStatusServiceNotifier, CAMERA_MODE>(
       CameraStatusServiceNotifier.new,
     );
 
 class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
-  /// Triggers a remote capture service to acquire a high-quality static frame.
-  ///
-  /// This method bypasses the live stream to request a specific 'capture_frame'
-  /// operation, subsequently updating the [manualScreenShotProvider] with the
-  /// returned Base64 image data.
+  RosBridgeClient get _rosClient => ref.read(rosBridgeClientProvider);
+
   Future<void> requestScreenshot() async {
     try {
-      final response = await _callCameraService("/detection/capture_frame", {
-        "quality": 100,
-      });
-      if (response.containsKey("image")) {
-        // Dispatches the received image to the persistent screenshot state.
-        ref.read(manualScreenShotProvider.notifier).setScreenshot(response["image"] as String);
+      // Usiamo callService del client centralizzato
+      final response = await _rosClient.callService(
+        service: "/detection/capture_frame",
+        args: {},
+      );
+      
+      if (response.containsKey("message")) {
+        ref.read(manualScreenShotProvider.notifier)
+           .setScreenshot(response["message"] as String);
       }
     } catch (e) {
       print("Error during screenshot request: $e");
-    }
-  }
-
-  /// Internal helper to execute a ROS 2 Service Call using the Rosbridge Protocol.
-  ///
-  /// Logic Implementation:
-  /// * **Idempotency**: Generates a timestamp-based `requestId` to ensure the
-  ///   response is matched correctly in a multi-message stream environment.
-  /// * **Subscription Lifecycle**: Opens a transient listener on the broadcast
-  ///   stream and ensures its disposal via a [finally] block to prevent memory leaks.
-  /// * **Fault Tolerance**: Implements a 3-second timeout to handle cases where
-  ///   the robot hardware or Rosbridge server is unresponsive.
-  Future<Map<String, dynamic>> _callCameraService(
-    String service,
-    Map<String, dynamic> args,
-  ) async {
-    final WebSocketChannel channel = ref.read(rosBridgeProvider);
-    final String requestId =
-        "${service}_${DateTime.now().millisecondsSinceEpoch}";
-    final completer = Completer<Map<String, dynamic>>();
-    final Stream stream = ref.read(rosBridgeStreamProvider);
-
-    // Establishing a temporary listener for the specific service response.
-    final StreamSubscription? sub = stream.listen((message) {
-      try {
-        final data = jsonDecode(message);
-
-        if (data["op"] == 'service_response' && data["id"] == requestId) {
-          final values = data["values"];
-          if (values is Map) {
-            completer.complete(Map<String, dynamic>.from(values));
-          } else {
-            print("ROS Service Error: $values");
-            completer.complete({});
-          }
-        }
-      } catch (e) {
-        print(e);
-      }
-    });
-
-    // Serializing and dispatching the JSON-RPC call.
-    channel.sink.add(
-      jsonEncode({
-        "op": "call_service",
-        "service": service,
-        'args': args,
-        "id": requestId,
-      }),
-    );
-
-    try {
-      return await completer.future.timeout(const Duration(seconds: 3));
-    } catch (e, stackTrace) {
-      // Propagating errors to the Riverpod state for UI feedback.
-      state = AsyncError(e, stackTrace);
-      return {};
-    } finally {
-      // Mandatory cleanup of the transient stream subscription.
-      sub!.cancel();
     }
   }
 
@@ -115,7 +58,7 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
   Future<void> setMode(CAMERA_MODE value) async {
     state = const AsyncLoading();
     try {
-      await _callCameraService("/detection/set_mode", {"mode": value.index});
+      await _rosClient.callService(service: "/detection/set_mode", args: {"mode": value.index});
       state = AsyncData(value);
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -125,7 +68,7 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
   /// Initializes the provider by fetching the current hardware status from the robot.
   @override
   Future<CAMERA_MODE> build() async {
-    final res = await _callCameraService("/detection/get_status", {});
+    final res = await _rosClient.callService(service: "/detection/get_status",args: {});
     return CAMERA_MODE.values[res["current_mode"]];
   }
 }

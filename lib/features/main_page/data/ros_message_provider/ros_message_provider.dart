@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
+import 'package:isaac_app/features/main_page/data/ros_publisher_provider/ros_publisher_provider.dart';
+import 'package:isaac_app/features/main_page/models/ros_bridge_client/ros_bridge_client.dart';
 
 /// Intercepts and decodes the incoming Rosbridge stream to isolate 'publish' operations.
 ///
@@ -22,26 +22,7 @@ import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros
 /// * **Stream Pruning**: Employs the [.where] operator to discard empty results,
 ///   ensuring that downstream listeners only rebuild when valid ROS data arrives.
 final rosMessagesProvider = StreamProvider<Map<String, dynamic>>((ref) {
-  // Subscribing to the centralized broadcast stream.
-  final stream = ref.watch(rosBridgeStreamProvider);
+  final RosBridgeClient rosBridgeClient = ref.watch(rosBridgeClientProvider);
 
-  return stream
-      .map((event) {
-        try {
-          final data = jsonDecode(event);
-
-          // Filtering for the "publish" opcode per Rosbridge specification.
-          if (data["op"] == "publish") {
-            return {
-              "topic": data["topic"] as String,
-              "msg": data["msg"] as Map<String, dynamic>,
-            };
-          }
-        } catch (e) {
-          // Catching malformed JSON to prevent stream termination.
-          print("Stream Decode Error: $e");
-        }
-        return <String, dynamic>{};
-      })
-      .where((data) => data.isNotEmpty);
+  return rosBridgeClient.allMessages();
 });

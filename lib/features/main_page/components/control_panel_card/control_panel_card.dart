@@ -31,33 +31,33 @@ class ControlPanelCard extends StatefulWidget {
 }
 
 class _ControlPanelCardState extends State<ControlPanelCard> {
-
   void _navigateToSection() {
     // Navigates to the page defined in the Folder model.
-              // MaterialPageRoute handles the platform-specific transition animations.
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) {
-                    return widget.element.goTopage;
-                  },
-                ),
-              );
+    // MaterialPageRoute handles the platform-specific transition animations.
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return widget.element.goTopage;
+        },
+      ),
+    );
   }
+
   @override
   Widget build(BuildContext context) {
     return Focus(
       onFocusChange: (hasFocus) => setState(() {}),
       onKeyEvent: (node, KeyEvent event) {
         if (event is KeyDownEvent &&
-            (event.logicalKey == LogicalKeyboardKey.enter) ||
+                (event.logicalKey == LogicalKeyboardKey.enter) ||
             (event.logicalKey == LogicalKeyboardKey.select) ||
             (event.logicalKey == LogicalKeyboardKey.gameButtonA)) {
-              _navigateToSection();
-              return KeyEventResult.handled;
+          _navigateToSection();
+          return KeyEventResult.handled;
         }
         return KeyEventResult.ignored;
-       },
+      },
       child: Builder(
         builder: (BuildContext context) {
           final bool isFocused = Focus.of(context).hasFocus;

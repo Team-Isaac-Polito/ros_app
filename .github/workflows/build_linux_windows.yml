@@ -41,6 +41,9 @@ jobs:
           path: build/linux/x64/release/bundle/
   build-windows:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [x64, arm64]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -56,11 +59,11 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Build Windows release
-        run: flutter build windows --release
+      - name: Build Windows release (${{ matrix.arch }})
+        run: flutter build windows --release --arch=${{ matrix.arch }}
 
-      - name: Upload Windows artifact
+      - name: Upload Windows artifact (${{ matrix.arch }})
         uses: actions/upload-artifact@v4
         with:
-          name: flutter-windows-build
-          path: build/windows/x64/runner/Release/
+          name: flutter-windows-${{ matrix.arch }}-build
+          path: build/windows/${{ matrix.arch }}/runner/Release/

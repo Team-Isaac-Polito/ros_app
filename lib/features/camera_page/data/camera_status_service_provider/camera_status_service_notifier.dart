@@ -30,11 +30,11 @@ final cameraProvider =
 class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
   RosBridgeClient get _rosClient => ref.read(rosBridgeClientProvider);
 
-  Future<void> requestScreenshot(int activeMonitor) async {
+  Future<void> requestScreenshot(int activeMonitor, String service) async {
     try {
       // Usiamo callService del client centralizzato
       final response = await _rosClient.callService(
-        service: "/detection/capture_frame",
+        service: service,
         args: {},
       );
       

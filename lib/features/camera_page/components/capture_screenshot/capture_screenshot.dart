@@ -21,7 +21,7 @@ class CaptureScreenshot extends ConsumerWidget {
     
     return ElevatedButton.icon(
       onPressed: () => isEmpty
-          ? ref.read(cameraProvider.notifier).requestScreenshot(activeMonitor)
+          ? ref.read(cameraProvider.notifier).requestScreenshot(activeMonitor, "/detection/capture_frame")
           : ref
                 .read(manualScreenShotProvider.notifier)
                 .clearScreenshot(activeMonitor),

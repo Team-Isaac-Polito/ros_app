@@ -12,7 +12,6 @@ import 'package:isaac_app/features/camera_page/intent/switch_monitor_intent.dart
 import 'package:isaac_app/features/camera_page/intent/zoom_intent.dart';
 import 'package:isaac_app/features/camera_page/models/camera_modes.dart';
 import 'package:isaac_app/features/main_page/data/dark_mode_provider/dark_mode_provider.dart';
-import 'package:isaac_app/utils/palette.dart';
 
 class CameraPage extends ConsumerStatefulWidget {
   const CameraPage({super.key});
@@ -100,14 +99,18 @@ class _CameraPageState extends ConsumerState<CameraPage> {
 
                       return Shortcuts(
                         shortcuts: <ShortcutActivator, Intent>{
-                          const SingleActivator(LogicalKeyboardKey.arrowRight) : SwitchMonitorIntent(1),
-                          const SingleActivator(LogicalKeyboardKey.arrowLeft) : SwitchMonitorIntent(-1)
+                          const SingleActivator(LogicalKeyboardKey.arrowRight):
+                              SwitchMonitorIntent(1),
+                          const SingleActivator(LogicalKeyboardKey.arrowLeft):
+                              SwitchMonitorIntent(-1),
                         },
                         child: Actions(
-                          actions: <Type,Action<Intent>>{
-                            SwitchMonitorIntent: CallbackAction<SwitchMonitorIntent>(
-                              onInvoke: (intent) => _switchMonitor(intent.direction) 
-                            )
+                          actions: <Type, Action<Intent>>{
+                            SwitchMonitorIntent:
+                                CallbackAction<SwitchMonitorIntent>(
+                                  onInvoke: (intent) =>
+                                      _switchMonitor(intent.direction),
+                                ),
                           },
                           child: Focus(
                             child: Stack(
@@ -133,9 +136,19 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                                   left: 10,
                                   bottom: 20,
                                   width: 220,
-                                  child: const IgnorePointer(child: DisplayedInfo()),
+                                  child: const IgnorePointer(
+                                    child: DisplayedInfo(),
+                                  ),
                                 ),
-                                _buildNavigationOverlay(),
+                                Builder(
+                                  builder: (context) {
+                                    final bool hasFocus = Focus.of(
+                                      context,
+                                    ).hasFocus;
+
+                                    return _buildNavigationOverlay(hasFocus);
+                                  },
+                                ),
                               ],
                             ),
                           ),
@@ -166,28 +179,38 @@ class _CameraPageState extends ConsumerState<CameraPage> {
     );
   }
 
-  Widget _buildNavigationOverlay() {
-    final isDark = ref.watch(darkModeProvider);
-
+  Widget _buildNavigationOverlay(bool hasFocus) {
     return Positioned.fill(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: const Icon(
-              Icons.chevron_left,
-              size: 50,
-              color: Colors.white38,
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.blue,
+            child: Center(
+              child: IconButton(
+                icon: const Icon(
+                  Icons.chevron_left,
+                  size: 45,
+                  color: Colors.white,
+                ),
+                onPressed: () => _switchMonitor(-1),
+              ),
             ),
-            onPressed: () => _switchMonitor(-1),
           ),
-          IconButton(
-            icon: Icon(
-              Icons.chevron_right,
-              size: 50,
-              color: isDark ? Colors.white38 : Colors.black38,
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.blue,
+            child: Center(
+              child: IconButton(
+                icon: Icon(
+                  Icons.chevron_right,
+                  size: 45,
+                  color: Colors.white,
+                ),
+                onPressed: () => _switchMonitor(1),
+              ),
             ),
-            onPressed: () => _switchMonitor(1),
           ),
         ],
       ),

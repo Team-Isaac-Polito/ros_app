@@ -20,7 +20,7 @@ class NoScreenshot extends ConsumerWidget {
         ),
         const SizedBox(height: 20),
         Text(
-          "DATA STREAM MONITOR $index",
+          "DATA STREAM MONITOR ${index+1}",
           style: TextStyle(color: isDark ? white : black, fontSize: 20),
         ),
       ],

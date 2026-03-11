@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isaac_app/features/camera_page/components/camera_button/camera_button.dart';
+import 'package:isaac_app/features/camera_page/components/capture_screenshot/capture_screenshot.dart';
 import 'package:isaac_app/features/camera_page/components/displayed_info/displayed_info.dart';
 import 'package:isaac_app/features/camera_page/components/no_screenshot/no_screenshot.dart';
 import 'package:isaac_app/features/camera_page/data/camera_status_service_provider/camera_status_service_notifier.dart';
@@ -9,6 +11,8 @@ import 'package:isaac_app/features/camera_page/data/manual_screenshot_provider/m
 import 'package:isaac_app/features/camera_page/intent/switch_monitor_intent.dart';
 import 'package:isaac_app/features/camera_page/intent/zoom_intent.dart';
 import 'package:isaac_app/features/camera_page/models/camera_modes.dart';
+import 'package:isaac_app/features/main_page/data/dark_mode_provider/dark_mode_provider.dart';
+import 'package:isaac_app/utils/palette.dart';
 
 class CameraPage extends ConsumerStatefulWidget {
   const CameraPage({super.key});
@@ -18,7 +22,8 @@ class CameraPage extends ConsumerStatefulWidget {
 }
 
 class _CameraPageState extends ConsumerState<CameraPage> {
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
   final FocusNode _pageFocusNode = FocusNode();
   double _currentScale = 1.0;
   Size _lastSize = Size.zero;
@@ -70,52 +75,76 @@ class _CameraPageState extends ConsumerState<CameraPage> {
       shortcuts: <ShortcutActivator, Intent>{
         const SingleActivator(LogicalKeyboardKey.equal): const ZoomIntent(0.2),
         const SingleActivator(LogicalKeyboardKey.minus): const ZoomIntent(-0.2),
-        const SingleActivator(LogicalKeyboardKey.arrowRight): const SwitchMonitorIntent(1),
-        const SingleActivator(LogicalKeyboardKey.arrowLeft): const SwitchMonitorIntent(-1),
       },
       child: Actions(
         actions: <Type, Action<Intent>>{
-          ZoomIntent: CallbackAction<ZoomIntent>(onInvoke: (intent) => _zoom(intent.delta)),
-          SwitchMonitorIntent: CallbackAction<SwitchMonitorIntent>(onInvoke: (intent) => _switchMonitor(intent.direction)),
+          ZoomIntent: CallbackAction<ZoomIntent>(
+            onInvoke: (intent) => _zoom(intent.delta),
+          ),
         },
         child: FocusScope(
           autofocus: true,
           child: Scaffold(
-            appBar: AppBar(title: Text("ISAAC MONITOR - SLOT ${_activeMonitor + 1}")),
+            appBar: AppBar(
+              title: Text("ISAAC MONITOR - SLOT ${_activeMonitor + 1}"),
+            ),
             body: Column(
               children: [
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      _lastSize = Size(constraints.maxWidth, constraints.maxHeight);
-                      return Stack(
-                        children: [
-                          Positioned.fill(
-                            child: InteractiveViewer(
-                              transformationController: _transformationController,
-                              clipBehavior: Clip.none,
-                              maxScale: 5.0,
-                              minScale: 1.0,
-                              child: Center(
-                                child: _buildMonitorContent(_activeMonitor, currentScreenshot, isEmpty),
-                              ),
+                      _lastSize = Size(
+                        constraints.maxWidth,
+                        constraints.maxHeight,
+                      );
+
+                      return Shortcuts(
+                        shortcuts: <ShortcutActivator, Intent>{
+                          const SingleActivator(LogicalKeyboardKey.arrowRight) : SwitchMonitorIntent(1),
+                          const SingleActivator(LogicalKeyboardKey.arrowLeft) : SwitchMonitorIntent(-1)
+                        },
+                        child: Actions(
+                          actions: <Type,Action<Intent>>{
+                            SwitchMonitorIntent: CallbackAction<SwitchMonitorIntent>(
+                              onInvoke: (intent) => _switchMonitor(intent.direction) 
+                            )
+                          },
+                          child: Focus(
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: InteractiveViewer(
+                                    transformationController:
+                                        _transformationController,
+                                    clipBehavior: Clip.none,
+                                    maxScale: 5.0,
+                                    minScale: 1.0,
+                                    child: Center(
+                                      child: _buildMonitorContent(
+                                        _activeMonitor,
+                                        currentScreenshot,
+                                        isEmpty,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 20,
+                                  left: 10,
+                                  bottom: 20,
+                                  width: 220,
+                                  child: const IgnorePointer(child: DisplayedInfo()),
+                                ),
+                                _buildNavigationOverlay(),
+                              ],
                             ),
                           ),
-                          
-                          Positioned(
-                            top: 20, left: 10, bottom: 20, width: 220,
-                            child: const IgnorePointer(child: DisplayedInfo()),
-                          ),
-
-                          _buildNavigationOverlay(),
-                        ],
+                        ),
                       );
                     },
                   ),
                 ),
-
                 _buildActionBar(isEmpty),
-
                 _buildModeGrid(cameraState),
                 const SizedBox(height: 10),
               ],
@@ -127,36 +156,37 @@ class _CameraPageState extends ConsumerState<CameraPage> {
   }
 
   Widget _buildMonitorContent(int index, String screenshot, bool isEmpty) {
-    
-    return Container(
-      color: Colors.black87,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (!isEmpty) Image.memory(base64Decode(screenshot), fit: BoxFit.contain),
-          if (isEmpty) Column(
-            children: [
-              Icon(index == 1 ? Icons.radar : Icons.analytics, size: 100, color: Colors.blueAccent),
-              const SizedBox(height: 20),
-              Text("DATA STREAM MONITOR $index", style: const TextStyle(color: Colors.white, fontSize: 20)),
-            ],
-          ),
-        ],
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (!isEmpty)
+          Image.memory(base64Decode(screenshot), fit: BoxFit.contain),
+        if (isEmpty) NoScreenshot(index: index),
+      ],
     );
   }
 
   Widget _buildNavigationOverlay() {
+    final isDark = ref.watch(darkModeProvider);
+
     return Positioned.fill(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            icon: const Icon(Icons.chevron_left, size: 50, color: Colors.white38),
+            icon: const Icon(
+              Icons.chevron_left,
+              size: 50,
+              color: Colors.white38,
+            ),
             onPressed: () => _switchMonitor(-1),
           ),
           IconButton(
-            icon: const Icon(Icons.chevron_right, size: 50, color: Colors.white38),
+            icon: Icon(
+              Icons.chevron_right,
+              size: 50,
+              color: isDark ? Colors.white38 : Colors.black38,
+            ),
             onPressed: () => _switchMonitor(1),
           ),
         ],
@@ -165,20 +195,11 @@ class _CameraPageState extends ConsumerState<CameraPage> {
   }
 
   Widget _buildActionBar(bool isEmpty) {
+    final isDark = ref.watch(darkModeProvider);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton.icon(
-            onPressed: () => isEmpty 
-              ? ref.read(cameraProvider.notifier).requestScreenshot(_activeMonitor) 
-              : ref.read(manualScreenShotProvider.notifier).clearScreenshot(_activeMonitor),
-            icon: Icon(isEmpty ? Icons.camera : Icons.refresh),
-            label: Text(isEmpty ? "Cattura Slot ${_activeMonitor + 1}" : "Reset Slot"),
-          ),
-        ],
-      ),
+      child: CaptureScreenshot(activeMonitor: _activeMonitor, isEmpty: isEmpty),
     );
   }
 
@@ -191,15 +212,14 @@ class _CameraPageState extends ConsumerState<CameraPage> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: CAMERA_MODE.values.length,
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 150, mainAxisSpacing: 8, crossAxisSpacing: 8, childAspectRatio: 2.5,
+            maxCrossAxisExtent: 150,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 2.5,
           ),
           itemBuilder: (context, index) {
             final mode = CAMERA_MODE.values[index];
-            return ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: currentMode == mode ? Colors.blue : null),
-              onPressed: () => ref.read(cameraProvider.notifier).setMode(mode),
-              child: Text(mode.name.toUpperCase(), style: const TextStyle(fontSize: 11)),
-            );
+            return CameraButton(mode: mode, currentMode: currentMode);
           },
         ),
       ),

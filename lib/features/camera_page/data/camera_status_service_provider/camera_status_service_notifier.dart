@@ -30,7 +30,7 @@ final cameraProvider =
 class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
   RosBridgeClient get _rosClient => ref.read(rosBridgeClientProvider);
 
-  Future<void> requestScreenshot() async {
+  Future<void> requestScreenshot(int activeMonitor) async {
     try {
       // Usiamo callService del client centralizzato
       final response = await _rosClient.callService(
@@ -40,7 +40,7 @@ class CameraStatusServiceNotifier extends AsyncNotifier<CAMERA_MODE> {
       
       if (response.containsKey("message")) {
         ref.read(manualScreenShotProvider.notifier)
-           .setScreenshot(response["message"] as String);
+           .setScreenshot(response["message"] as String,activeMonitor);
       }
     } catch (e) {
       print("Error during screenshot request: $e");

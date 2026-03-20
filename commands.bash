@@ -1,7 +1,5 @@
 #!/bin/bash
 
-WS_PATH="/home/salvatore/Documents/ros2_ws"
-ROS_SETUP="/opt/ros/jazzy/setup.bash"
 LAUNCH_CV=false
 LAUNCH_APP=false
 

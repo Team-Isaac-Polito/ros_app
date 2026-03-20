@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/main_page/data/index.dart';
 import 'package:isaac_app/features/main_page/data/ros_publisher_provider/ros_publisher_provider.dart';
 
 /// Represents the state of a ROS 2 sensor node.
@@ -52,10 +51,11 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
 
     if (response['success'] == true) {
       final String allStatuses = response['message'] ?? "";
+      print("All statures $allStatuses");
       // Esempio: "thermal: RUNNING"
       // Cerchiamo se il nostro serviceName (es: /ui/thermal) è RUNNING
       final myId = serviceName.split('/').last; // ottiene "thermal"
-      
+      print("id $myId");
       if (allStatuses.contains('$myId: RUNNING')) {
         return ModuleState.active;
       }
@@ -83,7 +83,9 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
       final success = response['success'] as bool? ?? false;
 
       if (success) {
-        final newState = enable ? ModuleState.active : ModuleState.inactive;
+        final ModuleState newState = enable
+            ? ModuleState.active
+            : ModuleState.inactive;
         state = AsyncValue.data(newState);
         print(
           "ROS2: Node $serviceName ${enable ? 'started' : 'stopped'} successfully",

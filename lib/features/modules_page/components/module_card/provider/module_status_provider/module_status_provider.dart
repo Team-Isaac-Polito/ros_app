@@ -51,9 +51,9 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
 
     if (response['success'] == true) {
       final String allStatuses = response['message'] ?? "";
-      // Esempio: "thermal: RUNNING"
-      // Cerchiamo se il nostro serviceName (es: /ui/thermal) è RUNNING
-      final myId = serviceName.split('/').last; // ottiene "thermal"
+      // Example: "thermal: RUNNING"
+      // Search if our service name (ex: /ui/thermal) is RUNNING
+      final myId = serviceName.split('/').last;
       
       if (allStatuses.contains('$myId: RUNNING')) {
         return ModuleState.active;
@@ -76,7 +76,7 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
       final response = await helper.callService(
         service: serviceName,
         args: {"status": enable ? "enable" : "disable"},
-        timeout: const Duration(seconds: 5),
+        timeout: const Duration(seconds: 10),
       );
 
       final success = response['success'] as bool? ?? false;

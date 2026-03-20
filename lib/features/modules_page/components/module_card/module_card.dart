@@ -56,9 +56,14 @@ class ModuleCard extends ConsumerWidget {
                 color: isFocused ? accentColor : Colors.transparent,
                 width: 3,
               ),
-              boxShadow: isFocused 
-                ? [BoxShadow(color: accentColor.withOpacity(0.3), blurRadius: 15)] 
-                : [],
+              boxShadow: isFocused
+                  ? [
+                      BoxShadow(
+                        color: accentColor.withOpacity(0.3),
+                        blurRadius: 15,
+                      ),
+                    ]
+                  : [],
             ),
             child: Card(
               elevation: isFocused ? 8 : 4,
@@ -119,13 +124,16 @@ class ModuleCard extends ConsumerWidget {
                         moduleStatus.when(
                           // Node status loaded successfully
                           data: (status) {
-                            final isActive = status == ModuleState.active;
+                            final isActive =
+                                status.index == ModuleState.active.index;
                             return Switch(
                               value: isActive,
                               onChanged: (bool value) {
                                 ref
                                     .read(
-                                      moduleStatusProvider(serviceName).notifier,
+                                      moduleStatusProvider(
+                                        serviceName,
+                                      ).notifier,
                                     )
                                     .toggle(value);
                               },

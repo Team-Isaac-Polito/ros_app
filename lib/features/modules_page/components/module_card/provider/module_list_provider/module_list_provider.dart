@@ -1,4 +1,7 @@
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isaac_app/features/main_page/data/ros_publisher_provider/ros_publisher_provider.dart';
 import 'package:isaac_app/features/main_page/data/ros_service_call_helper/ros_service_call_helper.dart';
 
 final moduleListProvider = AsyncNotifierProvider<ModuleListNotifier, List<String>>(
@@ -12,9 +15,9 @@ class ModuleListNotifier extends AsyncNotifier<List<String>> {
   }
 
   Future<List<String>> _fetchModulesFromGateway() async {
-    final helper = ref.read(rosServiceCallHelperProvider);
+    final helper = ref.read(rosBridgeClientProvider);
 
-    final response = await helper.call(
+    final response = await helper.callService(
       service: '/ui/node_status',
       args: {},
       timeout: const Duration(seconds: 5),

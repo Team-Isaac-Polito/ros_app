@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/main_page/data/ros_publisher_provider/ros_publisher_provider.dart';
+import 'package:isaac_app/features/main_page/data/ros_bridgeclient_provider/ros_bridgeclient_provider.dart';
 
-final moduleListProvider = AsyncNotifierProvider<ModuleListNotifier, List<String>>(
+final moduleListProvider =
+    AsyncNotifierProvider<ModuleListNotifier, List<String>>(
       ModuleListNotifier.new,
-);
+    );
 
 class ModuleListNotifier extends AsyncNotifier<List<String>> {
   @override
@@ -28,7 +29,7 @@ class ModuleListNotifier extends AsyncNotifier<List<String>> {
       final List<String> detectedModules = lines
           .map((line) {
             final parts = line.split(':');
-            return parts[0].trim(); 
+            return parts[0].trim();
           })
           .where((name) => name.isNotEmpty)
           .map((name) => '/ui/$name')

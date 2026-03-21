@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/modules_page/components/index.dart';
-import 'package:isaac_app/features/modules_page/provider/index.dart';
-import 'package:isaac_app/features/modules_page/provider/module_list_provider/module_list_provider.dart';
+import 'package:isaac_app/features/modules_page/data/extension/module_extension.dart';
+import 'package:isaac_app/features/modules_page/data/index.dart';
+import 'package:isaac_app/features/modules_page/data/module_list_provider/module_list_provider.dart';
 
 class ModulesPage extends ConsumerWidget {
   const ModulesPage({super.key});
@@ -36,15 +37,13 @@ class ModulesPage extends ConsumerWidget {
                   ),
                   itemBuilder: (context, index) {
                     final service = services[index];
+                    final theme = service.toModuleTheme;
+
                     return ModuleCard(
                       serviceName: service,
                       moduleName: service.split('/').last.toUpperCase(),
-                      icon: service.contains('thermal')
-                          ? Icons.thermostat
-                          : Icons.sensors,
-                      accentColor: service.contains('thermal')
-                          ? Colors.orange
-                          : Colors.green,
+                      icon: theme.icon,
+                      accentColor: theme.color,
                     );
                   },
                 ),

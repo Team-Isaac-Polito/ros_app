@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/main_page/data/ros_publisher_provider/ros_publisher_provider.dart';
+import 'package:isaac_app/features/main_page/data/ros_bridgeclient_provider/ros_bridgeclient_provider.dart';
 
 /// Represents the state of a ROS 2 sensor node.
 /// - [active]: Node is running on the robot

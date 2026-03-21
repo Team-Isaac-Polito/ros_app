@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/main_page/data/ros_publisher_provider/ros_publisher_provider.dart';
+import 'package:isaac_app/features/main_page/data/ros_bridgeclient_provider/ros_bridgeclient_provider.dart';
 import 'package:isaac_app/features/main_page/models/ros_bridge_client/ros_bridge_client.dart';
 
 /// Intercepts and decodes the incoming Rosbridge stream to isolate 'publish' operations.

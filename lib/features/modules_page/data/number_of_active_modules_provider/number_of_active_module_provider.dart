@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/modules_page/components/module_card/provider/module_list_provider/module_list_provider.dart';
-import 'package:isaac_app/features/modules_page/components/module_card/provider/module_status_provider/module_status_provider.dart';
+import 'package:isaac_app/features/modules_page/data/module_list_provider/module_list_provider.dart';
+import 'package:isaac_app/features/modules_page/data/module_status_provider/module_status_provider.dart';
 
 final numberOfActiveModulesProvider = Provider<int>((ref) {
   final modulesAsync = ref.watch(moduleListProvider);

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/camera_page/data/manual_screenshot_provider/manual_screenshot_provider.dart';
 import 'package:isaac_app/features/camera_page/models/camera_modes.dart';
-import 'package:isaac_app/features/main_page/data/ros_publisher_provider/ros_publisher_provider.dart';
+import 'package:isaac_app/features/main_page/data/ros_bridgeclient_provider/ros_bridgeclient_provider.dart';
 import 'package:isaac_app/features/main_page/models/ros_bridge_client/ros_bridge_client.dart';
 
 /// An [AsyncNotifier] that manages the operational state and service interactions

@@ -96,4 +96,29 @@ class RosBridgeClient {
         })
         .where((data) => data.isNotEmpty);
   }
+
+  // we need to subscribe and after getting the first message unsubscribe directly
+  Future<String> subscribeOnce(String topic) async {
+    channel.sink.add(jsonEncode({"op": "subscribe", "topic": topic}));
+    final data = await stream
+        .map((event) => jsonDecode(event))
+        .firstWhere(
+          (data) => data["op"] == "publish" && data["topic"] == topic,
+        );
+    channel.sink.add(jsonEncode({"op": "unsubscribe", "topic": topic}));
+    final msgData = data["msg"]["data"];
+    print(msgData.toString().substring(0,10));
+    if (msgData is List) {
+      List<int> bytes = List<int>.from(msgData);
+      return base64Encode(bytes);
+    }
+
+    String rawBase64 = msgData.toString();
+    if (rawBase64.contains(',')) {
+      rawBase64 = rawBase64.split(',').last;
+    }
+
+    print(rawBase64.substring(0,10));
+    return rawBase64.replaceAll(RegExp(r'[\s\n\r]'), '');
+  }
 }

@@ -51,11 +51,9 @@ class ModuleStatusNotifier extends AsyncNotifier<ModuleState> {
 
     if (response['success'] == true) {
       final String allStatuses = response['message'] ?? "";
-      print("All statures $allStatuses");
       // Esempio: "thermal: RUNNING"
       // Cerchiamo se il nostro serviceName (es: /ui/thermal) è RUNNING
       final myId = serviceName.split('/').last; // ottiene "thermal"
-      print("id $myId");
       if (allStatuses.contains('$myId: RUNNING')) {
         return ModuleState.active;
       }

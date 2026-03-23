@@ -222,7 +222,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: CaptureScreenshot(activeMonitor: _activeMonitor, isEmpty: isEmpty),
+      child: CaptureScreenshot(activeMonitor: _activeMonitor, isEmpty: isEmpty, topicToListen: _activeMonitor == 1 ? "/camera/aligned_depth_to_color/image_raw" : _activeMonitor == 2 ? "/detector/model_output" : "/thermal",),
     );
   }
 

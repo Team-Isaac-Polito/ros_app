@@ -8,23 +8,33 @@ import 'package:isaac_app/utils/palette.dart';
 class CaptureScreenshot extends ConsumerWidget {
   final bool isEmpty;
   final int activeMonitor;
+  final String topicToListen;
 
   const CaptureScreenshot({
     super.key,
     required this.activeMonitor,
     required this.isEmpty,
+    required this.topicToListen,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = ref.watch(darkModeProvider);
-    
+
     return ElevatedButton.icon(
-      onPressed: () => isEmpty
-          ? ref.read(cameraProvider.notifier).requestScreenshot(activeMonitor, "/detection/capture_frame")
-          : ref
-                .read(manualScreenShotProvider.notifier)
-                .clearScreenshot(activeMonitor),
+      onPressed: () {
+        print("Listening $topicToListen");
+
+        if (isEmpty) {
+          ref
+              .read(cameraProvider.notifier)
+              .requestScreenshot(activeMonitor, topicToListen);
+        } else {
+          ref
+              .read(manualScreenShotProvider.notifier)
+              .clearScreenshot(activeMonitor);
+        }
+      },
       icon: Icon(isEmpty ? Icons.camera : Icons.refresh),
       label: Text(
         isEmpty ? "Cattura Slot ${activeMonitor + 1}" : "Reset Slot",

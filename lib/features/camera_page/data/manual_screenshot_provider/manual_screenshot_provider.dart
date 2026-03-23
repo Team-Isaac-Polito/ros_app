@@ -17,17 +17,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 ///   affecting the visualization.
 /// * **Memory Efficiency**: By storing only the latest string, it prevents
 ///   memory bloat while providing an immediate source for [Image.memory] rendering.
-final manualScreenShotProvider = NotifierProvider<ManualScreenshot, List<String>>(
-  ManualScreenshot.new,
+final manualScreenShotProvider = NotifierProvider<ManualScreenshotNotifier, List<String>>(
+  ManualScreenshotNotifier.new,
 );
 
-class ManualScreenshot extends Notifier<List<String>> {
+class ManualScreenshotNotifier extends Notifier<List<String>> {
   /// Updates the current state with a new Base64 image string.
   ///
   /// This is typically called by the [CameraStatusServiceNotifier] after
   /// a successful '/detection/capture_frame' service response.
   void setScreenshot(String newScreenshot, int index) {
-    state = [...state]..[index] = newScreenshot;
+    final List<String> newList = List.from(state);
+    newList[index] = newScreenshot;
+    state = newList;
   }
 
   /// Resets the screenshot state to an empty string.
@@ -35,7 +37,9 @@ class ManualScreenshot extends Notifier<List<String>> {
   /// Use this to clear the "Inspection View" and return the UI to a
   /// placeholder or live stream mode.
   void clearScreenshot(int index) {
-    state = [...state]..[index] = "";
+    final List<String> newList = List.from(state);
+    newList[index] = "";
+    state = newList;
   }
 
   /// Initializes the provider with an empty string.

@@ -6,12 +6,14 @@ import 'package:isaac_app/features/camera_page/components/camera_button/camera_b
 import 'package:isaac_app/features/camera_page/components/capture_screenshot/capture_screenshot.dart';
 import 'package:isaac_app/features/camera_page/components/displayed_info/displayed_info.dart';
 import 'package:isaac_app/features/camera_page/components/no_screenshot/no_screenshot.dart';
+import 'package:isaac_app/features/camera_page/data/active_module_topic_provider/active_module_topic_provider.dart';
 import 'package:isaac_app/features/camera_page/data/camera_status_service_provider/camera_status_service_notifier.dart';
+import 'package:isaac_app/features/camera_page/data/hazmat_detection_provider/hazmat_detection_provider.dart';
 import 'package:isaac_app/features/camera_page/data/manual_screenshot_provider/manual_screenshot_provider.dart';
+import 'package:isaac_app/features/camera_page/data/qr_text_detection_provider/qr_text_detection_provider.dart';
 import 'package:isaac_app/features/camera_page/intent/switch_monitor_intent.dart';
 import 'package:isaac_app/features/camera_page/intent/zoom_intent.dart';
 import 'package:isaac_app/features/camera_page/models/camera_modes.dart';
-import 'package:isaac_app/features/main_page/data/dark_mode_provider/dark_mode_provider.dart';
 
 class CameraPage extends ConsumerStatefulWidget {
   const CameraPage({super.key});
@@ -69,6 +71,8 @@ class _CameraPageState extends ConsumerState<CameraPage> {
     final screenshotList = ref.watch(manualScreenShotProvider);
     final currentScreenshot = screenshotList[_activeMonitor];
     final bool isEmpty = currentScreenshot == "";
+    final hazmatAsync = ref.watch(hazMatProvider);
+    final qrCodeAsync = ref.watch(qrTextDetectionProvider);
 
     return Shortcuts(
       shortcuts: <ShortcutActivator, Intent>{
@@ -84,12 +88,14 @@ class _CameraPageState extends ConsumerState<CameraPage> {
         child: FocusScope(
           autofocus: true,
           child: Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               title: Text("ISAAC MONITOR - SLOT ${_activeMonitor + 1}"),
             ),
             body: Column(
               children: [
                 Expanded(
+                  flex: 3,
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       _lastSize = Size(
@@ -134,7 +140,6 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                                 Positioned(
                                   top: 20,
                                   left: 10,
-                                  bottom: 20,
                                   width: 220,
                                   child: const IgnorePointer(
                                     child: DisplayedInfo(),
@@ -157,9 +162,62 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                     },
                   ),
                 ),
-                _buildActionBar(isEmpty),
-                _buildModeGrid(cameraState),
-                const SizedBox(height: 10),
+                Flexible(
+                  flex: 1,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Column(
+                          children: [
+                            hazmatAsync.when(
+                              data: (hazmat) {
+                                if (hazmat.isEmpty)
+                                  return const SizedBox.shrink();
+                                return Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                  ),
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text("Hazmat value: $hazmat"),
+                                );
+                              },
+                              error: (err, st) =>
+                                  Text("Hazmat err: ${err.toString()}"),
+                              loading: () => const CircularProgressIndicator(),
+                            ),
+                            qrCodeAsync.when(
+                              data: (qrCode) {
+                                if (qrCode.isEmpty)
+                                  return const SizedBox.shrink();
+                                return Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                  ),
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text("Qrcode value: $qrCode"),
+                                );
+                              },
+                              error: (err, st) =>
+                                  Text("QR error ${err.toString()}"),
+                              loading: () => const CircularProgressIndicator(),
+                            ),
+                          ],
+                        ),
+                        _buildActionBar(isEmpty),
+                        _buildModeGrid(cameraState),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -203,11 +261,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
             backgroundColor: Colors.blue,
             child: Center(
               child: IconButton(
-                icon: Icon(
-                  Icons.chevron_right,
-                  size: 45,
-                  color: Colors.white,
-                ),
+                icon: Icon(Icons.chevron_right, size: 45, color: Colors.white),
                 onPressed: () => _switchMonitor(1),
               ),
             ),
@@ -218,11 +272,13 @@ class _CameraPageState extends ConsumerState<CameraPage> {
   }
 
   Widget _buildActionBar(bool isEmpty) {
-    final isDark = ref.watch(darkModeProvider);
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: CaptureScreenshot(activeMonitor: _activeMonitor, isEmpty: isEmpty, topicToListen: _activeMonitor == 1 ? "/camera/aligned_depth_to_color/image_raw" : _activeMonitor == 2 ? "/detector/model_output" : "/thermal",),
+      child: CaptureScreenshot(
+        activeMonitor: _activeMonitor,
+        isEmpty: isEmpty,
+        topicToListen: ref.watch(activeCameraTopicProvider(_activeMonitor)),
+      ),
     );
   }
 

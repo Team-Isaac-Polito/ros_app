@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/index.dart';
-import 'package:isaac_app/features/modules_page/data/module_status_provider/data/enum/modul_state.dart';
-import 'package:isaac_app/features/modules_page/data/module_status_provider/module_status_provider.dart'
-    hide ModuleState;
+import 'package:isaac_app/features/modules_page/data/module_status_provider/module_status_provider.dart';
 
 class ModuleCard extends ConsumerWidget {
   final String moduleName;
@@ -59,7 +57,7 @@ class ModuleCard extends ConsumerWidget {
               boxShadow: isFocused
                   ? [
                       BoxShadow(
-                        color: accentColor.withOpacity(0.3),
+                        color: accentColor.withValues(alpha: 0.3),
                         blurRadius: 15,
                       ),
                     ]

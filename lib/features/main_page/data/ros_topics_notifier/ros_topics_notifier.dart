@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/main_page/data/ros_bridge_stream_provider/ros_bridge_stream_provider.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridgeclient_provider/ros_bridgeclient_provider.dart';
 import 'package:isaac_app/features/main_page/models/index.dart';
 
@@ -34,6 +33,10 @@ class RosTopicsNotifier extends AsyncNotifier<List<Topic>> {
     return loadTopics();
   }
 
+  bool doTopicExists(String topicName) {
+    return state.value?.any((topic) => topic.topicName == topicName) ?? false;
+  }
+
   /// Performs a service call to the Rosbridge API to retrieve the current Topic Graph.
   ///
   /// Logic Implementation:
@@ -44,13 +47,10 @@ class RosTopicsNotifier extends AsyncNotifier<List<Topic>> {
   /// * **Timeout Protection**: Enforces a 5-second execution limit to prevent
   ///   the UI from hanging if the Rosbridge server fails to acknowledge the request.
   Future<List<Topic>> loadTopics() async {
-    final rosClient = ref.watch(rosBridgeClientProvider);
-    final Stream<String> stream = ref.read(rosBridgeStreamProvider);
-    final requestId = "get_topics_${DateTime.now().millisecondsSinceEpoch}";
-    final completer = Completer<List<Topic>>();
+    final rosClient = ref.read(rosBridgeClientProvider);
     // Listening to the centralized stream for the service response opcode.
     final response = await rosClient.callService(
-      service: "/rosapi/topics", 
+      service: "/rosapi/topics",
       timeout: const Duration(seconds: 5),
     );
 
@@ -60,10 +60,7 @@ class RosTopicsNotifier extends AsyncNotifier<List<Topic>> {
 
     for (int i = 0; i < names.length; i++) {
       result.add(
-        Topic(
-          topicName: names[i] as String,
-          topicType: types[i] as String,
-        ),
+        Topic(topicName: names[i] as String, topicType: types[i] as String),
       );
     }
     return result;

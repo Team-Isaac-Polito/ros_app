@@ -28,7 +28,7 @@ class CaptureScreenshot extends ConsumerWidget {
         print("Listening $topicToListen");
 
         if (cameraState.isLoading ||
-            cameraState.value == CAMERA_MODE.INITIALIZING) {
+            cameraState.value == CAMERA_MODE.INITIALIZING || cameraState.value == CAMERA_MODE.OFF) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
@@ -61,7 +61,7 @@ class CaptureScreenshot extends ConsumerWidget {
             )
           : Icon(isEmpty ? Icons.camera : Icons.refresh),
       label: Text(
-        isEmpty ? "Cattura Slot ${activeMonitor + 1}" : "Reset Slot",
+        isEmpty ? "Capture Slot ${activeMonitor + 1}" : "Reset Slot",
         style: TextStyle(color: isDark ? white : black),
       ),
     );

@@ -44,28 +44,28 @@ class _MainPageState extends ConsumerState<MainPage> {
               ),
             ),
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-              child: Text(
-                'Available Topics',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-          ),
-          topics.when(
-            data: (list) => SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, i) => TopicExpansionTile(topic: list[i]),
-                childCount: list.length,
-              ),
-            ),
-            loading: () => const SliverToBoxAdapter(
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            error: (err, st) =>
-                SliverToBoxAdapter(child: Center(child: Text('Error: $err'))),
-          ),
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          //     child: Text(
+          //       'Available Topics',
+          //       style: Theme.of(context).textTheme.titleLarge,
+          //     ),
+          //   ),
+          // ),
+          // topics.when(
+          //   data: (list) => SliverList(
+          //     delegate: SliverChildBuilderDelegate(
+          //       (context, i) => TopicExpansionTile(topic: list[i]),
+          //       childCount: list.length,
+          //     ),
+          //   ),
+          //   loading: () => const SliverToBoxAdapter(
+          //     child: Center(child: CircularProgressIndicator()),
+          //   ),
+          //   error: (err, st) =>
+          //       SliverToBoxAdapter(child: Center(child: Text('Error: $err'))),
+          // ),
         ],
       ),
     );

@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
+import 'package:isaac_app/utils/convert_raw_to_png_image.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class RosBridgeClient {
@@ -100,25 +103,64 @@ class RosBridgeClient {
   // we need to subscribe and after getting the first message unsubscribe directly
   Future<String> subscribeOnce(String topic) async {
     channel.sink.add(jsonEncode({"op": "subscribe", "topic": topic}));
-    final data = await stream
-        .map((event) => jsonDecode(event))
-        .firstWhere(
-          (data) => data["op"] == "publish" && data["topic"] == topic,
-        );
-    channel.sink.add(jsonEncode({"op": "unsubscribe", "topic": topic}));
-    final msgData = data["msg"]["data"];
-    print(msgData.toString().substring(0,10));
-    if (msgData is List) {
-      List<int> bytes = List<int>.from(msgData);
-      return base64Encode(bytes);
-    }
 
-    String rawBase64 = msgData.toString();
-    if (rawBase64.contains(',')) {
-      rawBase64 = rawBase64.split(',').last;
-    }
+    try {
+      Map<String, dynamic>? decodedEvent;
+      await stream
+          .firstWhere((e) {
+            final d = jsonDecode(e);
+            decodedEvent = d;
+            return d["op"] == "publish" && d["topic"] == topic;
+          })
+          .timeout(
+            const Duration(seconds: 5),
+            onTimeout: () {
+              throw TimeoutException(
+                "Il robot non ha risposto sul topic $topic entro 5 secondi",
+              );
+            },
+          );
 
-    print(rawBase64.substring(0,10));
-    return rawBase64.replaceAll(RegExp(r'[\s\n\r]'), '');
+      channel.sink.add(jsonEncode({"op": "unsubscribe", "topic": topic}));
+
+      final msg = decodedEvent?["msg"];
+      final dynamic rawData = msg["data"];
+
+      if (topic.endsWith("/compressed")) {
+        if (rawData is String) {
+          return rawData.replaceAll(RegExp(r'[\s\n\r]'), '');
+        } else if (rawData is List) {
+          return base64Encode(Uint8List.fromList(List<int>.from(rawData)));
+        }
+      } else {
+        final int width = msg['width'];
+        final int height = msg['height'];
+        final String encoding = msg['encoding']; // es: "rgb8" o "bgr8"
+        final List<int> bytes = rawData is String 
+            ? base64Decode(rawData.replaceAll(RegExp(r'[\s\n\r]'), '')) 
+            : List<int>.from(rawData);
+            
+        return await compute(_convertWrapper, {
+          'bytes': bytes,
+          'width': width,
+          'height': height,
+          'encoding': encoding,
+        });
+      }
+
+      throw Exception("Dati immagine non validi");
+    } catch (e) {
+      channel.sink.add(jsonEncode({"op": "unsubscribe", "topic": topic}));
+      rethrow;
+    }
   }
+}
+
+String _convertWrapper(Map<String, dynamic> map) {
+  return convertRawToPngBase64(
+    map['bytes'],
+    map['width'],
+    map['height'],
+    map['encoding'],
+  );
 }

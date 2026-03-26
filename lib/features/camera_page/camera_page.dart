@@ -2,18 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/camera_page/components/camera_button/camera_button.dart';
-import 'package:isaac_app/features/camera_page/components/capture_screenshot/capture_screenshot.dart';
-import 'package:isaac_app/features/camera_page/components/displayed_info/displayed_info.dart';
-import 'package:isaac_app/features/camera_page/components/no_screenshot/no_screenshot.dart';
-import 'package:isaac_app/features/camera_page/data/active_module_topic_provider/active_module_topic_provider.dart';
-import 'package:isaac_app/features/camera_page/data/camera_status_service_provider/camera_status_service_notifier.dart';
-import 'package:isaac_app/features/camera_page/data/hazmat_detection_provider/hazmat_detection_provider.dart';
-import 'package:isaac_app/features/camera_page/data/manual_screenshot_provider/manual_screenshot_provider.dart';
-import 'package:isaac_app/features/camera_page/data/qr_text_detection_provider/qr_text_detection_provider.dart';
-import 'package:isaac_app/features/camera_page/intent/switch_monitor_intent.dart';
-import 'package:isaac_app/features/camera_page/intent/zoom_intent.dart';
-import 'package:isaac_app/features/camera_page/models/camera_modes.dart';
+import 'package:isaac_app/features/camera_page/components/camera_buttons/camera_buttons.dart';
+import 'package:isaac_app/features/camera_page/components/index.dart';
+import 'package:isaac_app/features/camera_page/data/index.dart';
+import 'package:isaac_app/features/camera_page/intent/index.dart';
 
 class CameraPage extends ConsumerStatefulWidget {
   const CameraPage({super.key});
@@ -23,13 +15,12 @@ class CameraPage extends ConsumerStatefulWidget {
 }
 
 class _CameraPageState extends ConsumerState<CameraPage> {
-  final TransformationController _transformationController =
-      TransformationController();
+  final TransformationController _transformationController = TransformationController();
   final FocusNode _pageFocusNode = FocusNode();
   double _currentScale = 1.0;
   Size _lastSize = Size.zero;
   int _activeMonitor = 0;
-  final int _totalMonitors = 3;
+  final int _totalMonitors = 4;
 
   void _zoom(double delta) {
     if (!mounted || _lastSize == Size.zero) return;
@@ -67,12 +58,9 @@ class _CameraPageState extends ConsumerState<CameraPage> {
 
   @override
   Widget build(BuildContext context) {
-    final cameraState = ref.watch(cameraProvider);
     final screenshotList = ref.watch(manualScreenShotProvider);
     final currentScreenshot = screenshotList[_activeMonitor];
     final bool isEmpty = currentScreenshot == "";
-    final hazmatAsync = ref.watch(hazMatProvider);
-    final qrCodeAsync = ref.watch(qrTextDetectionProvider);
 
     return Shortcuts(
       shortcuts: <ShortcutActivator, Intent>{
@@ -129,11 +117,14 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                                     maxScale: 5.0,
                                     minScale: 1.0,
                                     child: Center(
-                                      child: _buildMonitorContent(
-                                        _activeMonitor,
-                                        currentScreenshot,
-                                        isEmpty,
-                                      ),
+                                      child: isEmpty
+                                          ? NoScreenshot(index: _activeMonitor)
+                                          : Image.memory(
+                                              base64Decode(currentScreenshot),
+                                              fit: BoxFit.contain,
+                                              filterQuality:
+                                                  FilterQuality.medium,
+                                            ),
                                     ),
                                   ),
                                 ),
@@ -147,11 +138,44 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                                 ),
                                 Builder(
                                   builder: (context) {
-                                    final bool hasFocus = Focus.of(
-                                      context,
-                                    ).hasFocus;
-
-                                    return _buildNavigationOverlay(hasFocus);
+                                    return Positioned.fill(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 30,
+                                            backgroundColor: Colors.blue,
+                                            child: Center(
+                                              child: IconButton(
+                                                icon: const Icon(
+                                                  Icons.chevron_left,
+                                                  size: 45,
+                                                  color: Colors.white,
+                                                ),
+                                                onPressed: () =>
+                                                    _switchMonitor(-1),
+                                              ),
+                                            ),
+                                          ),
+                                          CircleAvatar(
+                                            radius: 30,
+                                            backgroundColor: Colors.blue,
+                                            child: Center(
+                                              child: IconButton(
+                                                icon: Icon(
+                                                  Icons.chevron_right,
+                                                  size: 45,
+                                                  color: Colors.white,
+                                                ),
+                                                onPressed: () =>
+                                                    _switchMonitor(1),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
                                   },
                                 ),
                               ],
@@ -171,48 +195,21 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                       children: [
                         Column(
                           children: [
-                            hazmatAsync.when(
-                              data: (hazmat) {
-                                if (hazmat.isEmpty)
-                                  return const SizedBox.shrink();
-                                return Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 18,
-                                  ),
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text("Hazmat value: $hazmat"),
-                                );
-                              },
-                              error: (err, st) =>
-                                  Text("Hazmat err: ${err.toString()}"),
-                              loading: () => const CircularProgressIndicator(),
-                            ),
-                            qrCodeAsync.when(
-                              data: (qrCode) {
-                                if (qrCode.isEmpty)
-                                  return const SizedBox.shrink();
-                                return Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 18,
-                                  ),
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text("Qrcode value: $qrCode"),
-                                );
-                              },
-                              error: (err, st) =>
-                                  Text("QR error ${err.toString()}"),
-                              loading: () => const CircularProgressIndicator(),
-                            ),
+                            HazmatBanner(),
+                            QrCodeBanner(),
                           ],
                         ),
-                        _buildActionBar(isEmpty),
-                        _buildModeGrid(cameraState),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10.0),
+                          child: CaptureScreenshot(
+                            activeMonitor: _activeMonitor,
+                            isEmpty: isEmpty,
+                            topicToListen: ref.watch(
+                              activeCameraTopicProvider(_activeMonitor),
+                            ),
+                          ),
+                        ),
+                        CameraButtons(),
                         const SizedBox(height: 10),
                       ],
                     ),
@@ -223,87 +220,6 @@ class _CameraPageState extends ConsumerState<CameraPage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildMonitorContent(int index, String screenshot, bool isEmpty) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (!isEmpty)
-          Image.memory(base64Decode(screenshot), fit: BoxFit.contain),
-        if (isEmpty) NoScreenshot(index: index),
-      ],
-    );
-  }
-
-  Widget _buildNavigationOverlay(bool hasFocus) {
-    return Positioned.fill(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.blue,
-            child: Center(
-              child: IconButton(
-                icon: const Icon(
-                  Icons.chevron_left,
-                  size: 45,
-                  color: Colors.white,
-                ),
-                onPressed: () => _switchMonitor(-1),
-              ),
-            ),
-          ),
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.blue,
-            child: Center(
-              child: IconButton(
-                icon: Icon(Icons.chevron_right, size: 45, color: Colors.white),
-                onPressed: () => _switchMonitor(1),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionBar(bool isEmpty) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: CaptureScreenshot(
-        activeMonitor: _activeMonitor,
-        isEmpty: isEmpty,
-        topicToListen: ref.watch(activeCameraTopicProvider(_activeMonitor)),
-      ),
-    );
-  }
-
-  Widget _buildModeGrid(AsyncValue<CAMERA_MODE> cameraState) {
-    return cameraState.when(
-      data: (currentMode) => ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 600),
-        child: GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: CAMERA_MODE.values.length,
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 150,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 2.5,
-          ),
-          itemBuilder: (context, index) {
-            final mode = CAMERA_MODE.values[index];
-            return CameraButton(mode: mode, currentMode: currentMode);
-          },
-        ),
-      ),
-      loading: () => const CircularProgressIndicator(),
-      error: (e, _) => Text("Errore: $e"),
     );
   }
 }

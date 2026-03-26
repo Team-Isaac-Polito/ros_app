@@ -8,28 +8,39 @@ String convertRawToPngBase64(
   String encoding,
 ) {
   img.Image image = img.Image(width: width, height: height);
+  if (encoding.contains("mono") || encoding.contains("16UC1")) {
+    int maxVal = 1;
+    for (var b in bytes) if (b > maxVal) maxVal = b;
 
-  int pixelIndex = 0;
-  for (int y = 0; y < height; y++) {
-    for (int x = 0; x < width; x++) {
-      if (encoding == "rgb8") {
-        image.setPixelRgb(
-          x,
-          y,
-          bytes[pixelIndex],
-          bytes[pixelIndex + 1],
-          bytes[pixelIndex + 2],
-        );
-        pixelIndex += 3;
-      } else if (encoding == "bgr8") {
-        image.setPixelRgb(
-          x,
-          y,
-          bytes[pixelIndex + 2],
-          bytes[pixelIndex + 1],
-          bytes[pixelIndex],
-        );
-        pixelIndex += 3;
+    int p = 0;
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        int rawValue = bytes[p];
+        
+        if (encoding.contains("16")) {
+          rawValue = bytes[p] + (bytes[p + 1] << 8);
+          p += 2;
+        } else {
+          p += 1;
+        }
+
+        int normalized = ((rawValue / maxVal) * 255).toInt();
+        
+        image.setPixelRgb(x, y, normalized, normalized, normalized);
+      }
+    }
+  } 
+  else {
+    int pixelIndex = 0;
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        if (encoding == "rgb8") {
+          image.setPixelRgb(x, y, bytes[pixelIndex], bytes[pixelIndex + 1], bytes[pixelIndex + 2]);
+          pixelIndex += 3;
+        } else if (encoding == "bgr8") {
+          image.setPixelRgb(x, y, bytes[pixelIndex + 2], bytes[pixelIndex + 1], bytes[pixelIndex]);
+          pixelIndex += 3;
+        }
       }
     }
   }

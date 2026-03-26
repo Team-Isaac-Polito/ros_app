@@ -49,6 +49,6 @@ class ManualScreenshotNotifier extends Notifier<List<String>> {
   @override
   List<String> build() {
     // one screenshot for every monitor
-    return ["", "", ""];
+    return ["", "", "", ""];
   }
 }

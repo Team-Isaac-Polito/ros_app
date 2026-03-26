@@ -24,7 +24,7 @@ class CameraButton extends ConsumerWidget {
       ),
       onPressed: () => ref.read(cameraProvider.notifier).setMode(mode),
       child: Text(
-        mode.name.toUpperCase(),
+        mode.name.toUpperCase().replaceAll("_", " "),
         style: TextStyle(fontSize: 11, color: isDark ? white :  currentMode == mode ? white : black),
       ),
     );

@@ -11,12 +11,25 @@ class HazmatBanner extends ConsumerWidget {
 
     return hazmatAsync.when(
       data: (hazmat) {
-        if (hazmat.isEmpty) return const SizedBox.shrink();
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 18),
-          width: double.infinity,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-          child: Text("Hazmat value: $hazmat"),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Scanned Hazmat",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+              const SizedBox(height: 8),
+              Divider(),
+              ...hazmat.map((elm) {
+              return Text(elm);
+            })
+            ],
+          ),
         );
       },
       error: (err, st) => Text("Hazmat err: ${err.toString()}"),

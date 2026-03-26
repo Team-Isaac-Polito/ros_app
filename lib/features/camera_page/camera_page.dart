@@ -15,7 +15,8 @@ class CameraPage extends ConsumerStatefulWidget {
 }
 
 class _CameraPageState extends ConsumerState<CameraPage> {
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
   final FocusNode _pageFocusNode = FocusNode();
   double _currentScale = 1.0;
   Size _lastSize = Size.zero;
@@ -61,7 +62,6 @@ class _CameraPageState extends ConsumerState<CameraPage> {
     final screenshotList = ref.watch(manualScreenShotProvider);
     final currentScreenshot = screenshotList[_activeMonitor];
     final bool isEmpty = currentScreenshot == "";
-
     return Shortcuts(
       shortcuts: <ShortcutActivator, Intent>{
         const SingleActivator(LogicalKeyboardKey.equal): const ZoomIntent(0.2),
@@ -128,14 +128,6 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                                     ),
                                   ),
                                 ),
-                                Positioned(
-                                  top: 20,
-                                  left: 10,
-                                  width: 220,
-                                  child: const IgnorePointer(
-                                    child: DisplayedInfo(),
-                                  ),
-                                ),
                                 Builder(
                                   builder: (context) {
                                     return Positioned.fill(
@@ -178,6 +170,23 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                                     );
                                   },
                                 ),
+                                Consumer(
+                                  builder: (context, ref, child) {
+                                    final showInfo = ref.watch(
+                                      showDetailProvider,
+                                    );
+                                    return Positioned(
+                                      top: 20,
+                                      left: 100,
+                                      width: 500,
+                                      child: IgnorePointer(
+                                        child: showInfo
+                                            ? DisplayedInfo()
+                                            : const SizedBox.shrink(),
+                                      ),
+                                    );
+                                  },
+                                ),
                               ],
                             ),
                           ),
@@ -193,21 +202,29 @@ class _CameraPageState extends ConsumerState<CameraPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Column(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 10,
                           children: [
-                            HazmatBanner(),
-                            QrCodeBanner(),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0),
-                          child: CaptureScreenshot(
-                            activeMonitor: _activeMonitor,
-                            isEmpty: isEmpty,
-                            topicToListen: ref.watch(
-                              activeCameraTopicProvider(_activeMonitor),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10.0,
+                              ),
+                              child: CaptureScreenshot(
+                                activeMonitor: _activeMonitor,
+                                isEmpty: isEmpty,
+                                topicToListen: ref.watch(
+                                  activeCameraTopicProvider(_activeMonitor),
+                                ),
+                              ),
                             ),
-                          ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10.0,
+                              ),
+                              child: ShowDetailButton(),
+                            ),
+                          ],
                         ),
                         CameraButtons(),
                         const SizedBox(height: 10),

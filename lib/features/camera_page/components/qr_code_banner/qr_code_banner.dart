@@ -11,12 +11,25 @@ class QrCodeBanner extends ConsumerWidget {
 
     return qrCodeAsync.when(
       data: (qrCode) {
-        if (qrCode.isEmpty) return const SizedBox.shrink();
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 18),
-          width: double.infinity,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-          child: Text("Qrcode value: $qrCode"),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Scanned Qrcode",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+              const SizedBox(height: 8),
+              Divider(),
+              ...qrCode.map((elm) {
+              return Text(elm);
+            })
+            ],
+          ),
         );
       },
       error: (err, st) => Text("QR error ${err.toString()}"),

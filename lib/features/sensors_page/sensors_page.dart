@@ -9,6 +9,8 @@ class SensorsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text("Sensors"), centerTitle: true),
       body: GridView(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 450,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/dark_mode_provider/dark_mode_provider.dart';
-import 'package:isaac_app/utils/index.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class VelocitySensor extends ConsumerWidget {
@@ -20,36 +19,35 @@ class VelocitySensor extends ConsumerWidget {
             spacing: 20,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("Velocita'"),
+              Text("Velocity'"),
               Expanded(
                 child: SfRadialGauge(
                   axes: <RadialAxis>[
                     RadialAxis(
                       minimum: 0,
                       maximum: 0.25,
-                      showLabels: constraints.maxWidth > 200,
                       ranges: <GaugeRange>[
                         GaugeRange(
                           startValue: 0,
-                          endValue: 0.3,
+                          endValue: 0.1,
                           color: Colors.green,
                         ),
                         GaugeRange(
-                          startValue: 0.8,
-                          endValue: 0.17,
+                          startValue: 0.1,
+                          endValue: 0.2,
                           color: Colors.orange,
                         ),
                         GaugeRange(
-                          startValue: 0.18,
+                          startValue: 0.2,
                           endValue: 0.25,
                           color: Colors.red,
                         ),
                       ],
                       pointers: <GaugePointer>[
                         NeedlePointer(
-                          value: velocity,
+                          value: velocity, // Ensure this isn't NaN or Null
                           enableAnimation: true,
-                          needleColor: isDark ? white : black,
+                          needleColor: isDark ? Colors.white : Colors.black,
                         ),
                       ],
                       annotations: <GaugeAnnotation>[

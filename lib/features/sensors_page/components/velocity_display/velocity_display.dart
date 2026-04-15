@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/sensors_page/data/velocity_provider/velocity_provider.dart';
-import 'package:isaac_app/features/sensors_page/components/velocity_sensor/velocity_sensor.dart';
+import 'package:isaac_app/features/sensors_page/components/velocity_display/components/velocity_sensor/velocity_sensor.dart';
+import 'package:isaac_app/features/sensors_page/components/velocity_display/data/velocity_provider/velocity_provider.dart';
+
 
 class VelocityDisplay extends ConsumerWidget {
   const VelocityDisplay({super.key});
@@ -11,7 +12,7 @@ class VelocityDisplay extends ConsumerWidget {
     final velocityAsync = ref.watch(velocityProvider);
 
     return velocityAsync.when(
-      data: (velocity) => VelocitySensor(velocity: velocity ?? 0),
+      data: (velocity) => VelocitySensor(velocity: velocity ?? 0.0),
       error: (err, st) => Text(err.toString()),
       loading: () => Center(child: const CircularProgressIndicator())
     ); 

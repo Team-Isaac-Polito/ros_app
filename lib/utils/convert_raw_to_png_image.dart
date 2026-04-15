@@ -10,7 +10,9 @@ String convertRawToPngBase64(
   img.Image image = img.Image(width: width, height: height);
   if (encoding.contains("mono") || encoding.contains("16UC1")) {
     int maxVal = 1;
-    for (var b in bytes) if (b > maxVal) maxVal = b;
+    for (var b in bytes) {
+      if (b > maxVal) maxVal = b;
+    }
 
     int p = 0;
     for (int y = 0; y < height; y++) {

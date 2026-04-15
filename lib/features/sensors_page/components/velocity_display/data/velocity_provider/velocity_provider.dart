@@ -9,7 +9,8 @@ final velocityProvider = StreamProvider<double?>((ref) {
   return velocitySubscriber.map((msg){
     try {
       if (msg["linear"] != null && msg["linear"]["x"] != null) {
-        return (msg["linear"]["x"] as num).toDouble();
+        print("Received velocity: ${msg["linear"]["x"]}");
+        return (msg["linear"]["x"] as num).toDouble() * 100;
       }
   } catch (e) {
     return 0.0;

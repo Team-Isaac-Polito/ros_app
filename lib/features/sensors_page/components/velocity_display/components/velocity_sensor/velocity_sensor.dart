@@ -25,21 +25,21 @@ class VelocitySensor extends ConsumerWidget {
                   axes: <RadialAxis>[
                     RadialAxis(
                       minimum: 0,
-                      maximum: 0.25,
+                      maximum: 25,
                       ranges: <GaugeRange>[
                         GaugeRange(
                           startValue: 0,
-                          endValue: 0.1,
+                          endValue: 10,
                           color: Colors.green,
                         ),
                         GaugeRange(
-                          startValue: 0.1,
-                          endValue: 0.2,
+                          startValue: 10.1,
+                          endValue: 20.2,
                           color: Colors.orange,
                         ),
                         GaugeRange(
-                          startValue: 0.2,
-                          endValue: 0.25,
+                          startValue: 20.3,
+                          endValue: 25,
                           color: Colors.red,
                         ),
                       ],
@@ -53,7 +53,7 @@ class VelocitySensor extends ConsumerWidget {
                       annotations: <GaugeAnnotation>[
                         GaugeAnnotation(
                           widget: Text(
-                            '${velocity.toStringAsFixed(1)} m/s',
+                            '${velocity.abs().toStringAsFixed(1)} cm/s',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,

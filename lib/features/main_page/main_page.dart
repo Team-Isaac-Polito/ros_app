@@ -34,10 +34,7 @@ class _MainPageState extends ConsumerState<MainPage> {
             title: const Text("ISAAC Dashboard"),
             floating: true,
             snap: true,
-            actions: [
-              const DarkModeSwitcher(),
-              const RefreshSocketConnection(),
-            ],
+            actions: [AppbarActions()],
           ),
           SliverPadding(
             padding: const EdgeInsets.all(18),

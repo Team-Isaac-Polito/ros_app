@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:isaac_app/features/sensors_page/components/index.dart';
 
+import '../main_page/components/index.dart';
+
 class SensorsPage extends StatelessWidget {
   const SensorsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Sensors"), centerTitle: true),
+      appBar: AppBar(title: Text("Sensors"), centerTitle: true, actions: [AppbarActions()],
+),
       body: GridView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),

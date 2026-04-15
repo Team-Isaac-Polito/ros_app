@@ -5,6 +5,8 @@ import 'package:isaac_app/features/modules_page/data/extension/module_extension.
 import 'package:isaac_app/features/modules_page/data/index.dart';
 import 'package:isaac_app/features/modules_page/data/module_list_provider/module_list_provider.dart';
 
+import '../main_page/components/index.dart';
+
 class ModulesPage extends ConsumerWidget {
   const ModulesPage({super.key});
 
@@ -15,7 +17,7 @@ class ModulesPage extends ConsumerWidget {
     final nTotal = ref.watch(numberOfModulesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Modules")),
+      appBar: AppBar(title: const Text("Modules"),actions: [AppbarActions()],),
       body: modulesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text("Errore: $err")),

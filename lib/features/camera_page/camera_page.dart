@@ -7,6 +7,8 @@ import 'package:isaac_app/features/camera_page/components/index.dart';
 import 'package:isaac_app/features/camera_page/data/index.dart';
 import 'package:isaac_app/features/camera_page/intent/index.dart';
 
+import '../main_page/components/index.dart';
+
 class CameraPage extends ConsumerStatefulWidget {
   const CameraPage({super.key});
 
@@ -78,7 +80,8 @@ class _CameraPageState extends ConsumerState<CameraPage> {
           child: Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
-              title: Text("ISAAC MONITOR - SLOT ${_activeMonitor + 1}"),
+              title: Text("ISAAC MONITOR - SLOT ${_activeMonitor + 1}",),
+              actions: [AppbarActions()],
             ),
             body: Column(
               children: [

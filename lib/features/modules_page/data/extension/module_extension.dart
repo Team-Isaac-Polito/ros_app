@@ -16,12 +16,6 @@ extension ServiceXTheme on String {
           color: Colors.green,
           displayName: 'LIDAR',
         ),
-      'velocity' || 'vel' => const ModuleTheme(
-          icon: Icons.speed,
-          color: Colors.blue,
-          displayName: 'VELOCITY',
-        ),
-      _ => ModuleTheme.fallback,
     };
   }
 }

@@ -878,14 +878,18 @@ class _JoystickPadState extends State<_JoystickPad> {
         Text(widget.label,
             style: Theme.of(context).textTheme.labelSmall),
         const SizedBox(height: 4),
-        GestureDetector(
-          onPanStart: (d) => _update(d.localPosition),
-          onPanUpdate: (d) => _update(d.localPosition),
-          onPanEnd: (_) => _reset(),
-          onPanCancel: _reset,
-          child: CustomPaint(
-            size: Size(widget.size, widget.size),
-            painter: _JoystickPainter(dx: _dx, dy: _dy),
+        Listener(
+          onPointerUp: (_) => _reset(),
+          onPointerCancel: (_) => _reset(),
+          child: GestureDetector(
+            onPanStart: (d) => _update(d.localPosition),
+            onPanUpdate: (d) => _update(d.localPosition),
+            onPanEnd: (_) => _reset(),
+            onPanCancel: _reset,
+            child: CustomPaint(
+              size: Size(widget.size, widget.size),
+              painter: _JoystickPainter(dx: _dx, dy: _dy),
+            ),
           ),
         ),
       ],

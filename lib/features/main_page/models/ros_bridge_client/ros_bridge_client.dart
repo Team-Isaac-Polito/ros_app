@@ -14,7 +14,12 @@ class RosBridgeClient {
   RosBridgeClient(this.channel, this.stream);
 
   /// Publish a message to a topic
-  void publish(String topic, Map<String, dynamic> message) {
+  void publish(String topic, Map<String, dynamic> message, {String? type}) {
+    if (type != null) {
+      channel.sink.add(
+        jsonEncode({"op": "advertise", "topic": topic, "type": type}),
+      );
+    }
     channel.sink.add(
       jsonEncode({"op": "publish", "topic": topic, "msg": message}),
     );

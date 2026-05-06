@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isaac_app/features/sensors_page/models/latency_data/latency_data.dart';
+import 'package:isaac_app/features/sensors_page/components/latency_chart/data/ros_bandwidth_stream_provider/ros_bandwith_stream_provider.dart';
+import 'package:isaac_app/features/sensors_page/components/latency_chart/data/ros_traffic_provider/ros_traffic_provider.dart';
+import 'package:isaac_app/features/sensors_page/components/latency_chart/models/bandwidth_data.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class LatencyChartWidget extends ConsumerWidget {

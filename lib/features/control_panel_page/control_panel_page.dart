@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/control_panel_page/data/autonomy_providers.dart';
+import 'package:isaac_app/features/control_panel_page/components/map_3d_viewer.dart';
 import 'package:isaac_app/features/main_page/components/index.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridgeclient_provider/ros_bridgeclient_provider.dart';
 
@@ -32,6 +33,7 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
   bool _showScan = true;
   bool _drawMode = true;
   bool _isTap = false;
+  bool _use3DView = false; // ← Nuovo: toggle 2D/3D
 
   // --- Teleop state -------------------------------------------------------
   double _rightJoyX = 0.0;
@@ -40,8 +42,10 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
   double _leftJoyY = 0.0;
   double _leftJoyZ = 0.0;
   double _rightJoyZ = 0.0;
+
   /// Switch states (S1–S5, index 0–4). False = up (default).
   final List<bool> _switchStates = [false, false, false, false, false];
+
   /// Button states (BGREEN–BBLUE, index 0–4). True = released (active-low).
   final List<bool> _buttonStates = [true, true, true, true, true];
 
@@ -66,15 +70,28 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
 
   // -- coordinate transforms ------------------------------------------------
 
-  Offset _worldToCanvas(MapWaypoint wp, OccupancyGridData map, double cellSize,
-      int cropMinX, int cropMinY, int cropH) {
+  Offset _worldToCanvas(
+    MapWaypoint wp,
+    OccupancyGridData map,
+    double cellSize,
+    int cropMinX,
+    int cropMinY,
+    int cropH,
+  ) {
     final mx = (wp.x - map.originX) / map.resolution - cropMinX;
     final my = (wp.y - map.originY) / map.resolution - cropMinY;
     return Offset(mx * cellSize, (cropH - 1 - my) * cellSize);
   }
 
-  MapWaypoint? _canvasToWorld(Offset canvasPoint, OccupancyGridData map,
-      double cellSize, int cropMinX, int cropMinY, int cropW, int cropH) {
+  MapWaypoint? _canvasToWorld(
+    Offset canvasPoint,
+    OccupancyGridData map,
+    double cellSize,
+    int cropMinX,
+    int cropMinY,
+    int cropW,
+    int cropH,
+  ) {
     final mx = canvasPoint.dx / cellSize + cropMinX;
     final my = cropMinY + cropH - canvasPoint.dy / cellSize;
     final cellX = mx.floor();
@@ -109,8 +126,15 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
   }
 
   /// Handle freehand drawing via pan gesture.
-  void _handleDraw(Offset globalPos, OccupancyGridData map, double cellSize,
-      int cropMinX, int cropMinY, int cropW, int cropH) {
+  void _handleDraw(
+    Offset globalPos,
+    OccupancyGridData map,
+    double cellSize,
+    int cropMinX,
+    int cropMinY,
+    int cropW,
+    int cropH,
+  ) {
     final box =
         _mapContainerKey.currentContext?.findRenderObject() as RenderBox?;
     if (box == null) return;
@@ -120,16 +144,26 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
     final canvasPoint = _drawMode
         ? localInWidget
         : MatrixUtils.transformPoint(
-            Matrix4.inverted(_transformCtrl.value), localInWidget);
+            Matrix4.inverted(_transformCtrl.value),
+            localInWidget,
+          );
 
-    final wp = _canvasToWorld(canvasPoint, map, cellSize, cropMinX, cropMinY,
-        cropW, cropH);
+    final wp = _canvasToWorld(
+      canvasPoint,
+      map,
+      cellSize,
+      cropMinX,
+      cropMinY,
+      cropW,
+      cropH,
+    );
     if (wp == null) return;
 
     if (_waypoints.isNotEmpty && !_isTap) {
       final prev = _waypoints.last;
       final dist = math.sqrt(
-          math.pow(wp.x - prev.x, 2) + math.pow(wp.y - prev.y, 2));
+        math.pow(wp.x - prev.x, 2) + math.pow(wp.y - prev.y, 2),
+      );
       if (dist < _minPointSpacingMeters) return;
 
       // Interpolate intermediate points for smooth lines
@@ -138,10 +172,12 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
         final newPoints = <MapWaypoint>[];
         for (var i = 1; i < steps; i++) {
           final t = i / steps;
-          newPoints.add(MapWaypoint(
-            x: prev.x + (wp.x - prev.x) * t,
-            y: prev.y + (wp.y - prev.y) * t,
-          ));
+          newPoints.add(
+            MapWaypoint(
+              x: prev.x + (wp.x - prev.x) * t,
+              y: prev.y + (wp.y - prev.y) * t,
+            ),
+          );
         }
         newPoints.add(wp);
         setState(() => _waypoints.addAll(newPoints));
@@ -181,13 +217,15 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
       'nanosec': (now.microsecondsSinceEpoch % 1000000) * 1000,
     };
     final poses = _waypoints
-        .map((wp) => {
-              'header': {'frame_id': 'map', 'stamp': stamp},
-              'pose': {
-                'position': {'x': wp.x, 'y': wp.y, 'z': 0.0},
-                'orientation': {'x': 0.0, 'y': 0.0, 'z': 0.0, 'w': 1.0},
-              },
-            })
+        .map(
+          (wp) => {
+            'header': {'frame_id': 'map', 'stamp': stamp},
+            'pose': {
+              'position': {'x': wp.x, 'y': wp.y, 'z': 0.0},
+              'orientation': {'x': 0.0, 'y': 0.0, 'z': 0.0, 'w': 1.0},
+            },
+          },
+        )
         .toList();
     client.publish('/autonomy/user_path', {
       'header': {'frame_id': 'map', 'stamp': stamp},
@@ -204,19 +242,20 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
 
   void _toggleAutonomy(bool enable) {
     final client = ref.read(rosBridgeClientProvider);
-    client.publish(
-        '/autonomy/enabled', {'data': enable}, type: 'std_msgs/msg/Bool');
+    client.publish('/autonomy/enabled', {
+      'data': enable,
+    }, type: 'std_msgs/msg/Bool');
   }
 
   // -- teleop helpers --------------------------------------------------------
 
   void _publishArmVel(double x, double y, double z) {
     final client = ref.read(rosBridgeClientProvider);
-    client.publish(
-      '/mk2_arm_vel',
-      {'x': x * 0.3, 'y': y * 0.3, 'z': z * 0.3},
-      type: 'geometry_msgs/msg/Vector3',
-    );
+    client.publish('/mk2_arm_vel', {
+      'x': x * 0.3,
+      'y': y * 0.3,
+      'z': z * 0.3,
+    }, type: 'geometry_msgs/msg/Vector3');
   }
 
   /// Publish a full /remote message.  toggleSwitch flips switch state;
@@ -232,28 +271,20 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
       buttons[5 + pulseButton] = false; // active-low: false = pressed
     }
     final client = ref.read(rosBridgeClientProvider);
-    client.publish(
-      '/remote',
-      {
-        'left': {'x': _leftJoyX, 'y': _leftJoyY, 'z': _leftJoyZ},
-        'right': {'x': _rightJoyX, 'y': _rightJoyY, 'z': _rightJoyZ},
-        'buttons': buttons,
-      },
-      type: 'reseq_interfaces/msg/Remote',
-    );
+    client.publish('/remote', {
+      'left': {'x': _leftJoyX, 'y': _leftJoyY, 'z': _leftJoyZ},
+      'right': {'x': _rightJoyX, 'y': _rightJoyY, 'z': _rightJoyZ},
+      'buttons': buttons,
+    }, type: 'reseq_interfaces/msg/Remote');
     if (pulseButton != null) {
       Future.delayed(const Duration(milliseconds: 150), () {
         if (!mounted) return;
         final rel = List<bool>.from(_switchStates)..addAll(_buttonStates);
-        ref.read(rosBridgeClientProvider).publish(
-          '/remote',
-          {
-            'left': {'x': 0.0, 'y': 0.0, 'z': 0.0},
-            'right': {'x': 0.0, 'y': 0.0, 'z': 0.0},
-            'buttons': rel,
-          },
-          type: 'reseq_interfaces/msg/Remote',
-        );
+        ref.read(rosBridgeClientProvider).publish('/remote', {
+          'left': {'x': 0.0, 'y': 0.0, 'z': 0.0},
+          'right': {'x': 0.0, 'y': 0.0, 'z': 0.0},
+          'buttons': rel,
+        }, type: 'reseq_interfaces/msg/Remote');
       });
     }
   }
@@ -317,7 +348,10 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                       ),
                       OutlinedButton.icon(
                         onPressed: _clearPath,
-                        icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                        icon: const Icon(
+                          Icons.delete_outline_rounded,
+                          size: 18,
+                        ),
                         label: const Text('Clear'),
                       ),
                       FilterChip(
@@ -334,6 +368,16 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                           size: 16,
                         ),
                       ),
+                      // ── 2D/3D Toggle ───────────────────────────────
+                      FilterChip(
+                        label: Text(_use3DView ? '3D View' : '2D View'),
+                        selected: _use3DView,
+                        onSelected: (v) => setState(() => _use3DView = v),
+                        avatar: Icon(
+                          _use3DView ? Icons.view_in_ar : Icons.map,
+                          size: 16,
+                        ),
+                      ),
                       // ── Switches popup ──────────────────────────────
                       PopupMenuButton<int>(
                         tooltip: 'Switches',
@@ -341,7 +385,8 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                           avatar: Icon(Icons.toggle_on_rounded, size: 16),
                           label: Text('Switches'),
                         ),
-                        onSelected: (idx) => setState(() => _sendRemote(toggleSwitch: idx)),
+                        onSelected: (idx) =>
+                            setState(() => _sendRemote(toggleSwitch: idx)),
                         itemBuilder: (_) => [
                           for (final e in switchLabels)
                             PopupMenuItem<int>(
@@ -349,9 +394,13 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                               child: Row(
                                 children: [
                                   Icon(
-                                    _switchStates[e.$1] ? Icons.toggle_on : Icons.toggle_off,
+                                    _switchStates[e.$1]
+                                        ? Icons.toggle_on
+                                        : Icons.toggle_off,
                                     size: 18,
-                                    color: _switchStates[e.$1] ? Colors.green : Colors.grey,
+                                    color: _switchStates[e.$1]
+                                        ? Colors.green
+                                        : Colors.grey,
                                   ),
                                   const SizedBox(width: 6),
                                   Text(e.$2),
@@ -364,7 +413,10 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                       PopupMenuButton<int>(
                         tooltip: 'Buttons',
                         child: const Chip(
-                          avatar: Icon(Icons.radio_button_checked_rounded, size: 16),
+                          avatar: Icon(
+                            Icons.radio_button_checked_rounded,
+                            size: 16,
+                          ),
                           label: Text('Buttons'),
                         ),
                         onSelected: (idx) => _sendRemote(pulseButton: idx),
@@ -382,149 +434,194 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                         // ── Map ──────────────────────────────────────────
                         Positioned.fill(
                           child: mapAsync.when(
-                      loading: () => const Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 12),
-                            Text('Waiting for /map ...'),
-                          ],
-                        ),
-                      ),
-                      error: (err, _) => Center(child: Text('Map error: $err')),
-                      data: (map) {
-                        final crop = _getCropBounds(map);
-                        final cropMinX = crop.$1;
-                        final cropMinY = crop.$2;
-                        final cropW = crop.$3 - crop.$1;
-                        final cropH = crop.$4 - crop.$2;
-
-                        return LayoutBuilder(
-                          builder: (context, constraints) {
-                            final availW = constraints.maxWidth;
-                            final availH = constraints.maxHeight;
-                            final cellSize = math.min(
-                                availW / cropW, availH / cropH);
-                            final canvasW = cropW * cellSize;
-                            final canvasH = cropH * cellSize;
-
-                            final scanPoints =
-                                _showScan ? mapScanPoints : <LaserPoint>[];
-                            final robotPose = poseAsync.value;
-
-                            final mapWidget = CustomPaint(
-                              size: Size(canvasW, canvasH),
-                              painter: _MapPainter(
-                                map: map,
-                                cellSize: cellSize,
-                                cropMinX: cropMinX,
-                                cropMinY: cropMinY,
-                                cropW: cropW,
-                                cropH: cropH,
-                                waypoints: _waypoints,
-                                scanPoints: scanPoints,
-                                robotPose: robotPose,
-                                robotSegments: robotSegments,
-                                worldToCanvas: (wp) => _worldToCanvas(
-                                    wp, map, cellSize, cropMinX, cropMinY, cropH),
+                            loading: () => const Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(height: 12),
+                                  Text('Waiting for /map ...'),
+                                ],
                               ),
-                            );
+                            ),
+                            error: (err, _) =>
+                                Center(child: Text('Map error: $err')),
+                            data: (map) {
+                              final scanPoints = _showScan
+                                  ? mapScanPoints
+                                  : <LaserPoint>[];
+                              final robotPose = poseAsync.value;
 
-                            return Center(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Container(
-                                  key: _mapContainerKey,
-                                  width: canvasW,
-                                  height: canvasH,
-                                color: const Color(0xFF1A2332),
-                                  child: _drawMode
-                                      ? Listener(
-                                          onPointerDown: (e) {
-                                            if (e.buttons != 1) return;
-                                            _isTap = true;
-                                            _handleDraw(
-                                              e.position,
-                                              map,
-                                              cellSize,
-                                              cropMinX,
-                                              cropMinY,
-                                              cropW,
-                                              cropH);
-                                          },
-                                          onPointerMove: (e) {
-                                            if (e.buttons != 1) return;
-                                            _handleDraw(
-                                              e.position,
-                                              map,
-                                              cellSize,
-                                              cropMinX,
-                                              cropMinY,
-                                              cropW,
-                                              cropH);
-                                          },
-                                          child: mapWidget,
-                                        )
-                                      : Listener(
-                                          onPointerSignal: (event) {
-                                            if (event is PointerScrollEvent) {
-                                              setState(() {
-                                                final scaleFactor =
-                                                    event.scrollDelta.dy > 0
-                                                        ? 0.9
-                                                        : 1.1;
-                                                final m = _transformCtrl
-                                                    .value
-                                                    .clone();
-                                                final focal =
-                                                    event.localPosition;
-                                                m.translate(
-                                                    focal.dx, focal.dy);
-                                                m.scale(scaleFactor,
-                                                    scaleFactor);
-                                                m.translate(
-                                                    -focal.dx, -focal.dy);
-                                                _transformCtrl.value = m;
-                                              });
-                                            }
-                                          },
-                                          child: GestureDetector(
-                                            onPanUpdate: (details) {
-                                              setState(() {
-                                                final m = _transformCtrl
-                                                    .value
-                                                    .clone();
-                                                m.translate(
-                                                    details.delta.dx /
-                                                        m.getMaxScaleOnAxis(),
-                                                    details.delta.dy /
-                                                        m.getMaxScaleOnAxis());
-                                                _transformCtrl.value = m;
-                                              });
-                                            },
-                                            child: ClipRect(
-                                              child: AnimatedBuilder(
-                                                animation: _transformCtrl,
-                                                builder: (context, child) =>
-                                                    Transform(
-                                                  transform:
-                                                      _transformCtrl.value,
-                                                  child: child,
-                                                ),
+                              // ── 3D View ──────────────────────────────
+                              if (_use3DView) {
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    key: _mapContainerKey,
+                                    color: const Color(0xFF0A0E27),
+                                    child: Map3DViewer(
+                                      map: map,
+                                      waypoints: _waypoints,
+                                      robotPose: robotPose,
+                                      robotSegments: robotSegments,
+                                      scanPoints: scanPoints,
+                                      showScan: _showScan,
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              // ── 2D View ──────────────────────────────
+                              final crop = _getCropBounds(map);
+                              final cropMinX = crop.$1;
+                              final cropMinY = crop.$2;
+                              final cropW = crop.$3 - crop.$1;
+                              final cropH = crop.$4 - crop.$2;
+
+                              return LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final availW = constraints.maxWidth;
+                                  final availH = constraints.maxHeight;
+                                  final cellSize = math.min(
+                                    availW / cropW,
+                                    availH / cropH,
+                                  );
+                                  final canvasW = cropW * cellSize;
+                                  final canvasH = cropH * cellSize;
+
+                                  final mapWidget = CustomPaint(
+                                    size: Size(canvasW, canvasH),
+                                    painter: _MapPainter(
+                                      map: map,
+                                      cellSize: cellSize,
+                                      cropMinX: cropMinX,
+                                      cropMinY: cropMinY,
+                                      cropW: cropW,
+                                      cropH: cropH,
+                                      waypoints: _waypoints,
+                                      scanPoints: scanPoints,
+                                      robotPose: robotPose,
+                                      robotSegments: robotSegments,
+                                      worldToCanvas: (wp) => _worldToCanvas(
+                                        wp,
+                                        map,
+                                        cellSize,
+                                        cropMinX,
+                                        cropMinY,
+                                        cropH,
+                                      ),
+                                    ),
+                                  );
+
+                                  return Center(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Container(
+                                        key: _mapContainerKey,
+                                        width: canvasW,
+                                        height: canvasH,
+                                        color: const Color(0xFF1A2332),
+                                        child: _drawMode
+                                            ? Listener(
+                                                onPointerDown: (e) {
+                                                  if (e.buttons != 1) return;
+                                                  _isTap = true;
+                                                  _handleDraw(
+                                                    e.position,
+                                                    map,
+                                                    cellSize,
+                                                    cropMinX,
+                                                    cropMinY,
+                                                    cropW,
+                                                    cropH,
+                                                  );
+                                                },
+                                                onPointerMove: (e) {
+                                                  if (e.buttons != 1) return;
+                                                  _handleDraw(
+                                                    e.position,
+                                                    map,
+                                                    cellSize,
+                                                    cropMinX,
+                                                    cropMinY,
+                                                    cropW,
+                                                    cropH,
+                                                  );
+                                                },
                                                 child: mapWidget,
+                                              )
+                                            : Listener(
+                                                onPointerSignal: (event) {
+                                                  if (event
+                                                      is PointerScrollEvent) {
+                                                    setState(() {
+                                                      final scaleFactor =
+                                                          event.scrollDelta.dy >
+                                                              0
+                                                          ? 0.9
+                                                          : 1.1;
+                                                      final m = _transformCtrl
+                                                          .value
+                                                          .clone();
+                                                      final focal =
+                                                          event.localPosition;
+                                                      m.translate(
+                                                        focal.dx,
+                                                        focal.dy,
+                                                      );
+                                                      m.scale(
+                                                        scaleFactor,
+                                                        scaleFactor,
+                                                      );
+                                                      m.translate(
+                                                        -focal.dx,
+                                                        -focal.dy,
+                                                      );
+                                                      _transformCtrl.value = m;
+                                                    });
+                                                  }
+                                                },
+                                                child: GestureDetector(
+                                                  onPanUpdate: (details) {
+                                                    setState(() {
+                                                      final m = _transformCtrl
+                                                          .value
+                                                          .clone();
+                                                      m.translate(
+                                                        details.delta.dx /
+                                                            m.getMaxScaleOnAxis(),
+                                                        details.delta.dy /
+                                                            m.getMaxScaleOnAxis(),
+                                                      );
+                                                      _transformCtrl.value = m;
+                                                    });
+                                                  },
+                                                  child: ClipRect(
+                                                    child: AnimatedBuilder(
+                                                      animation: _transformCtrl,
+                                                      builder:
+                                                          (
+                                                            context,
+                                                            child,
+                                                          ) => Transform(
+                                                            transform:
+                                                                _transformCtrl
+                                                                    .value,
+                                                            child: child,
+                                                          ),
+                                                      child: mapWidget,
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                        ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
                         // ── Arm joystick + Z slider (bottom-left) ────────
                         Align(
                           alignment: Alignment.bottomLeft,
@@ -566,7 +663,8 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                                 _AxisSlider(
                                   label: 'Pitch',
                                   trackWidth: 130.0,
-                                  onChanged: (v) => setState(() => _rightJoyZ = v),
+                                  onChanged: (v) =>
+                                      setState(() => _rightJoyZ = v),
                                 ),
                                 const SizedBox(height: 6),
                                 _JoystickPad(
@@ -598,8 +696,10 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
               child: ListView(
                 children: [
                   // ── Autonomy ────────────────────────────────────────────
-                  Text('Autonomy',
-                      style: Theme.of(context).textTheme.titleSmall),
+                  Text(
+                    'Autonomy',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
                   const SizedBox(height: 6),
                   Row(
                     children: [
@@ -622,9 +722,18 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                   ),
                   const Divider(height: 20),
                   // ── Status ─────────────────────────────────────────────
-                  _StatusCard(title: 'Status', value: statusAsync.value ?? '\u2014'),
-                  _StatusCard(title: 'Health', value: healthAsync.value ?? '\u2014'),
-                  _StatusCard(title: 'Cmd Source', value: cmdSrcAsync.value ?? '\u2014'),
+                  _StatusCard(
+                    title: 'Status',
+                    value: statusAsync.value ?? '\u2014',
+                  ),
+                  _StatusCard(
+                    title: 'Health',
+                    value: healthAsync.value ?? '\u2014',
+                  ),
+                  _StatusCard(
+                    title: 'Cmd Source',
+                    value: cmdSrcAsync.value ?? '\u2014',
+                  ),
                   const SizedBox(height: 8),
                   mapAsync.whenOrNull(
                         data: (map) => _StatusCard(
@@ -639,9 +748,11 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                     value: _waypoints.isEmpty
                         ? 'None'
                         : _waypoints
-                            .map((wp) =>
-                                '(${wp.x.toStringAsFixed(2)}, ${wp.y.toStringAsFixed(2)})')
-                            .join('\n'),
+                              .map(
+                                (wp) =>
+                                    '(${wp.x.toStringAsFixed(2)}, ${wp.y.toStringAsFixed(2)})',
+                              )
+                              .join('\n'),
                   ),
                 ],
               ),
@@ -709,7 +820,11 @@ class _MapPainter extends CustomPainter {
         final rect = Rect.fromLTWH(cx * cellSize, canvasY, cellSize, cellSize);
         canvas.drawRect(
           rect,
-          value < 0 ? unknownPaint : value > 50 ? occupiedPaint : freePaint,
+          value < 0
+              ? unknownPaint
+              : value > 50
+              ? occupiedPaint
+              : freePaint,
         );
         // Draw grid border on free/occupied cells only
         if (value >= 0 && cellSize > 3) {
@@ -740,10 +855,10 @@ class _MapPainter extends CustomPainter {
         ..color = const Color(0xFF16A34A)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5;
-      final trackFill =
-          Paint()..color = const Color(0xFF1F2937).withOpacity(0.7);
-      final jointFill =
-          Paint()..color = const Color(0xFF9CA3AF).withOpacity(0.6);
+      final trackFill = Paint()
+        ..color = const Color(0xFF1F2937).withOpacity(0.7);
+      final jointFill = Paint()
+        ..color = const Color(0xFF9CA3AF).withOpacity(0.6);
       final jointOutline = Paint()
         ..color = const Color(0xFF6B7280)
         ..style = PaintingStyle.stroke
@@ -764,16 +879,18 @@ class _MapPainter extends CustomPainter {
         final trackOffsetY = (moduleWidth / 2 - trackWidth / 2) * metersToPx;
         canvas.drawRect(
           Rect.fromCenter(
-              center: Offset(0, -trackOffsetY),
-              width: trackW,
-              height: trackH),
+            center: Offset(0, -trackOffsetY),
+            width: trackW,
+            height: trackH,
+          ),
           trackFill,
         );
         canvas.drawRect(
           Rect.fromCenter(
-              center: Offset(0, trackOffsetY),
-              width: trackW,
-              height: trackH),
+            center: Offset(0, trackOffsetY),
+            width: trackW,
+            height: trackH,
+          ),
           trackFill,
         );
 
@@ -799,7 +916,6 @@ class _MapPainter extends CustomPainter {
           canvas.drawCircle(Offset(jx, jy), jointR, jointOutline);
         }
       }
-
     }
 
     // Path
@@ -875,8 +991,7 @@ class _JoystickPadState extends State<_JoystickPad> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(widget.label,
-            style: Theme.of(context).textTheme.labelSmall),
+        Text(widget.label, style: Theme.of(context).textTheme.labelSmall),
         const SizedBox(height: 4),
         Listener(
           onPointerUp: (_) => _reset(),
@@ -912,10 +1027,7 @@ class _JoystickPainter extends CustomPainter {
 
     // Square background
     final bgRect = Rect.fromLTRB(2, 2, size.width - 2, size.height - 2);
-    canvas.drawRect(
-      bgRect,
-      Paint()..color = const Color(0xFFE0E0E0),
-    );
+    canvas.drawRect(bgRect, Paint()..color = const Color(0xFFE0E0E0));
     canvas.drawRect(
       bgRect,
       Paint()
@@ -1019,7 +1131,12 @@ class _AxisSliderPainter extends CustomPainter {
     const thumbR = 10.0;
 
     // Background track
-    final bgRect = Rect.fromLTRB(cx - trackHalfW, 2, cx + trackHalfW, size.height - 2);
+    final bgRect = Rect.fromLTRB(
+      cx - trackHalfW,
+      2,
+      cx + trackHalfW,
+      size.height - 2,
+    );
     canvas.drawRRect(
       RRect.fromRectAndRadius(bgRect, const Radius.circular(6)),
       Paint()..color = const Color(0xFFE0E0E0),
@@ -1047,13 +1164,22 @@ class _AxisSliderPainter extends CustomPainter {
       final fillTop = value > 0 ? thumbY : cy;
       final fillBot = value > 0 ? cy : thumbY;
       canvas.drawRect(
-        Rect.fromLTRB(cx - trackHalfW + 2, fillTop, cx + trackHalfW - 2, fillBot),
+        Rect.fromLTRB(
+          cx - trackHalfW + 2,
+          fillTop,
+          cx + trackHalfW - 2,
+          fillBot,
+        ),
         Paint()..color = const Color(0xFF1E88E5).withOpacity(0.35),
       );
     }
 
     // Thumb
-    canvas.drawCircle(Offset(cx, thumbY), thumbR, Paint()..color = const Color(0xFF1E88E5));
+    canvas.drawCircle(
+      Offset(cx, thumbY),
+      thumbR,
+      Paint()..color = const Color(0xFF1E88E5),
+    );
     canvas.drawCircle(
       Offset(cx, thumbY),
       thumbR,

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:isaac_app/features/main_page/data/robot_ip_notifier/robot_ip_provider.dart';
 
 /// Manages the primary [WebSocketChannel] to the ROS environment.
 ///
@@ -17,10 +18,11 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 ///   is closed when the provider is no longer in use, preventing memory leaks
 ///   or ghost subscriptions in the robot's backend.
 final rosBridgeProvider = Provider<WebSocketChannel>((ref) {
+  final String robotIp = ref.watch(robotIpProvider);
   // Establishing connection to the Rosbridge WebSocket server.
   // Standard port is 9090. Use 'ws://' for unencrypted or 'wss://' for secure sockets.
   final WebSocketChannel channel = WebSocketChannel.connect(
-    Uri.parse("ws://192.168.8.104:9090"),
+    Uri.parse(robotIp),
   );
 
   // According to Riverpod Documentation (https://riverpod.dev/docs/concepts/modifiers/on_dispose),

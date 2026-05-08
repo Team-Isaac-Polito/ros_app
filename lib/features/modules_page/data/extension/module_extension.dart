@@ -16,7 +16,11 @@ extension ServiceXTheme on String {
           color: Colors.green,
           displayName: 'LIDAR',
         ),
-        _ => const ModuleTheme(icon: Icons.device_unknown, color: Colors.grey, displayName: 'UNKNOWN'),
+      _ => const ModuleTheme(
+          icon: Icons.device_unknown,
+          color: Colors.grey,
+          displayName: 'UNKNOWN',
+        ),
     };
   }
 }

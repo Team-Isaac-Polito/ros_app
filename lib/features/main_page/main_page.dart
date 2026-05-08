@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/components/index.dart';
 import 'package:isaac_app/features/main_page/data/folders_provider/folder_list_provider.dart';
 // import 'package:isaac_app/features/main_page/data/ros_topics_notifier/ros_topics_notifier.dart';
+import  'package:isaac_app/features/main_page/data/robot_ip_notifier/robot_ip_provider.dart';
+import 'package:isaac_app/features/main_page/components/change_ip_dropdown/change_ip_dropdown.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
@@ -26,15 +28,30 @@ class _MainPageState extends ConsumerState<MainPage> {
     final folders = ref.watch(folderListProvider);
     // It reads all the topics that rosBridge exposes to us the traffic
     //final topics = ref.watch(rosTopicsProvider);
-
+    final String ip = ref.watch(robotIpProvider);
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            title: const Text("ISAAC Dashboard"),
+            title: const Row(
+              spacing: 10,
+              children: [
+                Text("ISAAC Dashboard"),
+                ChangeIpDropdown()
+              ]
+            ),
             floating: true,
             snap: true,
             actions: [AppbarActions()],
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              child: Text(
+                "You're currently connected to $ip",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
           ),
           SliverPadding(
             padding: const EdgeInsets.all(18),

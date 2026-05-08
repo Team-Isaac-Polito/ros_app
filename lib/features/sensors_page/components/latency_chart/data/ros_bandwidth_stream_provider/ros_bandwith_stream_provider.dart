@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isaac_app/features/sensors_page/components/latency_chart/data/ros_traffic_counter/ros_traffic_counter.dart';
 
 final bandwidthProvider = StreamProvider<List<double>>((ref) async* {
   double lastTotal = 0.0;

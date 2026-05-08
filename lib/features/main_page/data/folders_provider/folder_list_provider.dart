@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isaac_app/features/control_panel_page/index.dart';
 import 'package:isaac_app/features/camera_page/camera_page.dart';
 import 'package:isaac_app/features/main_page/models/folder/folder.dart';
 import 'package:isaac_app/features/modules_page/index.dart';
@@ -37,6 +38,11 @@ final folderListProvider = Provider<List<Folder>>(
       name: "Camera",
       icon: Icons.camera_alt_rounded,
       goTopage: const CameraPage(),
+    ),
+    Folder(
+      name: "Control Panel",
+      icon: Icons.explore_rounded,
+      goTopage: const ControlPanelPage(),
     ),
   ],
 );

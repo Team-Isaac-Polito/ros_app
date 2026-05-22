@@ -67,7 +67,6 @@ class _ControlPanelCardState extends State<ControlPanelCard> {
             onTap: () => _navigateToSection(),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(

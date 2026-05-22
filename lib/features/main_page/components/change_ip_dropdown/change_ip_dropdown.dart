@@ -12,28 +12,18 @@ class ChangeIpDropdown extends ConsumerWidget {
     final robotIpNotifier = ref.read(robotIpProvider.notifier);
     final possibleRobotIps = ref.watch(robotIpListProvider);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: Theme.of(
-          context,
-        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+    return DropdownButtonHideUnderline(
+      child: DropdownButton<String>(
+        value: currentRobotIp,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
-          width: 1,
-        ),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: currentRobotIp,
-          icon: const Icon(Icons.sensors, size: 20),
-          borderRadius: BorderRadius.circular(12),
-          dropdownColor: Theme.of(context).colorScheme.surface,
-          items: possibleRobotIps.entries.map((entry) {
-            return DropdownMenuItem<String>(
-              value: entry.key,
+        dropdownColor: Theme.of(context).colorScheme.surface,
+        items: possibleRobotIps.entries.map((entry) {
+          return DropdownMenuItem<String>(
+            value: entry.key,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
+                spacing: 10,
                 children: [
                   Icon(
                     entry.key.contains('localhost')
@@ -42,21 +32,20 @@ class ChangeIpDropdown extends ConsumerWidget {
                     size: 18,
                     color: Theme.of(context).colorScheme.primary,
                   ),
-                  const SizedBox(width: 10),
                   Text(
                     entry.value,
                     style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            if (newValue != null) {
-              robotIpNotifier.changeIp(newValue);
-            }
-          },
-        ),
+            ),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          if (newValue != null) {
+            robotIpNotifier.changeIp(newValue);
+          }
+        },
       ),
     );
   }

@@ -17,7 +17,7 @@ class ModulesPage extends ConsumerWidget {
     final nTotal = ref.watch(numberOfModulesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Modules"),actions: [AppbarActions()],),
+      appBar: AppBar(title: const Text("Modules"),actions: [AppbarActions(),],),
       body: modulesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text("Errore: $err")),

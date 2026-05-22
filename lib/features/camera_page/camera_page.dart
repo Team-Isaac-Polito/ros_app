@@ -64,9 +64,10 @@ class _CameraPageState extends ConsumerState<CameraPage> {
     final screenshotList = ref.watch(manualScreenShotProvider);
     final currentScreenshot = screenshotList[_activeMonitor];
     final bool isEmpty = currentScreenshot == "";
+    
     return Shortcuts(
       shortcuts: <ShortcutActivator, Intent>{
-        const SingleActivator(LogicalKeyboardKey.equal): const ZoomIntent(0.2),
+        const SingleActivator(LogicalKeyboardKey.greater): const ZoomIntent(0.2),
         const SingleActivator(LogicalKeyboardKey.minus): const ZoomIntent(-0.2),
       },
       child: Actions(
@@ -81,7 +82,7 @@ class _CameraPageState extends ConsumerState<CameraPage> {
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
               title: Text("ISAAC MONITOR - SLOT ${_activeMonitor + 1}",),
-              actions: [AppbarActions()],
+              actions: [AppbarActions(),],
             ),
             body: Column(
               children: [

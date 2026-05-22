@@ -4,7 +4,6 @@ import 'package:isaac_app/features/main_page/components/index.dart';
 import 'package:isaac_app/features/main_page/data/folders_provider/folder_list_provider.dart';
 // import 'package:isaac_app/features/main_page/data/ros_topics_notifier/ros_topics_notifier.dart';
 import  'package:isaac_app/features/main_page/data/robot_ip_notifier/robot_ip_provider.dart';
-import 'package:isaac_app/features/main_page/components/change_ip_dropdown/change_ip_dropdown.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
@@ -33,13 +32,7 @@ class _MainPageState extends ConsumerState<MainPage> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            title: const Row(
-              spacing: 10,
-              children: [
-                Text("ISAAC Dashboard"),
-                ChangeIpDropdown()
-              ]
-            ),
+            title: const Text("ISAAC Dashboard"),      
             floating: true,
             snap: true,
             actions: [AppbarActions()],
@@ -47,10 +40,21 @@ class _MainPageState extends ConsumerState<MainPage> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-              child: Text(
-                "You're currently connected to $ip",
+              child: RichText(
+                text: TextSpan(
+                text: "You're currently connected to ",
                 style: Theme.of(context).textTheme.titleLarge,
+                children: [
+                  TextSpan(
+                    text: ip,
+                    style: TextStyle(
+                      fontWeight:  FontWeight.bold,
+                      color: Colors.blue
+                    )
+                  )
+                ]
               ),
+              )
             ),
           ),
           SliverPadding(

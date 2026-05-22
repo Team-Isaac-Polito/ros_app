@@ -4,8 +4,9 @@ import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isaac_app/features/control_panel_page/components/req_gazebo_screen_page/req_gazebo_screen_page.dart';
 import 'package:isaac_app/features/control_panel_page/data/autonomy_providers.dart';
-import 'package:isaac_app/features/control_panel_page/components/map_3d_viewer.dart';
+import 'package:isaac_app/features/control_panel_page/data/useGazebomap_notifier/useGazebomap_notifier.dart';
 import 'package:isaac_app/features/main_page/components/index.dart';
 import 'package:isaac_app/features/main_page/data/ros_bridgeclient_provider/ros_bridgeclient_provider.dart';
 
@@ -33,7 +34,6 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
   bool _showScan = true;
   bool _drawMode = true;
   bool _isTap = false;
-  bool _use3DView = false; // ← Nuovo: toggle 2D/3D
 
   // --- Teleop state -------------------------------------------------------
   double _rightJoyX = 0.0;
@@ -301,6 +301,8 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
     final healthAsync = ref.watch(autonomyHealthProvider);
     final cmdSrcAsync = ref.watch(autonomyCmdSourceProvider);
     final colorScheme = Theme.of(context).colorScheme;
+    final bool useGazeboView = ref.watch(useGazebomapProvider); 
+
 
     const switchLabels = [
       (0, 'S1 – Beak Open/Close'),
@@ -368,13 +370,13 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                           size: 16,
                         ),
                       ),
-                      // ── 2D/3D Toggle ───────────────────────────────
+                      // ── 2D/Gazebo Toggle ───────────────────────────────
                       FilterChip(
-                        label: Text(_use3DView ? '3D View' : '2D View'),
-                        selected: _use3DView,
-                        onSelected: (v) => setState(() => _use3DView = v),
+                        label: Text(useGazeboView ? '2D View' : 'Gazebo Sim'),
+                        selected: useGazeboView,
+                        onSelected: (v) => ref.read(useGazebomapProvider.notifier).toggleGazebo(),
                         avatar: Icon(
-                          _use3DView ? Icons.view_in_ar : Icons.map,
+                          useGazeboView ? Icons.view_in_ar : Icons.map,
                           size: 16,
                         ),
                       ),
@@ -452,21 +454,14 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                                   : <LaserPoint>[];
                               final robotPose = poseAsync.value;
 
-                              // ── 3D View ──────────────────────────────
-                              if (_use3DView) {
+                              // ── Gazebo View ──────────────────────────────
+                              if (useGazeboView) {
                                 return ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
                                   child: Container(
                                     key: _mapContainerKey,
                                     color: const Color(0xFF0A0E27),
-                                    child: Map3DViewer(
-                                      map: map,
-                                      waypoints: _waypoints,
-                                      robotPose: robotPose,
-                                      robotSegments: robotSegments,
-                                      scanPoints: scanPoints,
-                                      showScan: _showScan,
-                                    ),
+                                    child:ReqGazeboScreenPage(),
                                   ),
                                 );
                               }

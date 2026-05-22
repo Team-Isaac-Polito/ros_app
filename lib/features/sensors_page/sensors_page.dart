@@ -23,7 +23,6 @@ class SensorsPage extends StatelessWidget {
         ),
         children: [
           VelocityDisplay(),
-          TemperatureSensor(),
           LatencyChartWidget(),
         ],
       ),

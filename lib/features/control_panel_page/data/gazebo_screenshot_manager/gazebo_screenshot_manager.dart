@@ -32,7 +32,7 @@ class GazeboScreenshotManagerNotifier extends Notifier<Uint8List?> {
         state = Uint8List.fromList(process?.stdout as List<int>);
         exception = null;
       } else {
-        final errorString = process?.stderr != null ? String.fromCharCodes(process!.stderr as List<int>) : "No error output";
+        final errorString = process?.stderr is String ? process?.stderr as String : process?.stderr.toString() ?? "unknown error";
         exception = errorString;
         print("Exception gazebo screenshot linux process: $exception");
         state = null;

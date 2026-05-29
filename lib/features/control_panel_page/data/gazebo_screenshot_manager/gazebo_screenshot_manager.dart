@@ -15,16 +15,16 @@ final gazeboScreenshotManagerProvider =
 class GazeboScreenshotManagerNotifier extends Notifier<Uint8List?> {
   ProcessResult? process;
   String? exception;
+  
   void takeScreenshot() async {
     print("Fired");
     try {
       process = await Process.run(
-        "/bin/bash",
+        "scrot",
         [
-          '-c',
-          'import -window "\$(xdotool search --name "Gazebo" | head -n 1)" png:-',
+          '-z', // Modalità silenziosa (evita beep o flash grafici)
+          '-',  // Dice a scrot di sparare i byte PNG direttamente nel stdout (RAM)
         ],
-        // We use stdoutEncoding: nullto tell dart to capture raw bytes and not a text string
         stdoutEncoding: null,
       );
 
@@ -32,14 +32,18 @@ class GazeboScreenshotManagerNotifier extends Notifier<Uint8List?> {
         state = Uint8List.fromList(process?.stdout as List<int>);
         exception = null;
       } else {
-        final errorString = process?.stderr is String ? process?.stderr as String : process?.stderr.toString() ?? "unknown error";
+        final errorString = process?.stderr is String 
+            ? process?.stderr as String 
+            : process?.stderr.toString() ?? "Errore sconosciuto";
+
         exception = errorString;
-        print("Exception gazebo screenshot linux process: $exception");
+        print("🚨 L'ERRORE DI SCROT È: $errorString");
         state = null;
       }
     } catch (e) {
       exception = e.toString();
       print("Exception gazebo screenshot $exception");
+      state = null;
     }
   }
 

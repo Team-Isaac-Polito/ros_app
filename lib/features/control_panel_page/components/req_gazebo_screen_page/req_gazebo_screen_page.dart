@@ -17,34 +17,36 @@ class ReqGazeboScreenPage extends ConsumerStatefulWidget {
 }
 
 class _CameraPageState extends ConsumerState<ReqGazeboScreenPage> {
-  @override
-  Widget build(BuildContext context) {
-    final gazeboProcessStatus = ref.watch(gazeboProcessManagerProvider);
-    final gazeboScreenshot = ref.watch(gazeboScreenshotManagerProvider);
-    final isDark = ref.watch(darkModeProvider);
 
-    final TransformationController _transformationController =
+  final TransformationController transformationController =
         TransformationController();
-    double _currentScale = 1.0;
-    Size _lastSize = Size.zero;
+    double currentScale = 1.0;
+    Size lastSize = Size.zero;
 
-    void _zoom(double delta) {
-      if (!mounted || _lastSize == Size.zero) return;
+    void zoom(double delta) {
+      if (!mounted || lastSize == Size.zero) return;
       setState(() {
-        double oldScale = _currentScale;
-        _currentScale = (_currentScale + delta).clamp(1.0, 5.0);
-        double factor = _currentScale / oldScale;
+        double oldScale = currentScale;
+        currentScale = (currentScale + delta).clamp(1.0, 5.0);
+        double factor = currentScale / oldScale;
 
-        final double centerX = _lastSize.width / 2;
-        final double centerY = _lastSize.height / 2;
+        final double centerX = lastSize.width / 2;
+        final double centerY = lastSize.height / 2;
 
-        _transformationController.value =
-            _transformationController.value.clone()
+        transformationController.value =
+            transformationController.value.clone()
               ..translate(centerX, centerY)
               ..scale(factor)
               ..translate(-centerX, -centerY);
       });
     }
+
+
+  @override
+  Widget build(BuildContext context) {
+    final gazeboProcessStatus = ref.watch(gazeboProcessManagerProvider);
+    final gazeboScreenshot = ref.watch(gazeboScreenshotManagerProvider);
+    final isDark = ref.watch(darkModeProvider);
 
     return Shortcuts(
       shortcuts: <ShortcutActivator, Intent>{
@@ -56,7 +58,7 @@ class _CameraPageState extends ConsumerState<ReqGazeboScreenPage> {
       child: Actions(
         actions: <Type, Action<Intent>>{
           ZoomIntent: CallbackAction<ZoomIntent>(
-            onInvoke: (intent) => _zoom(intent.delta),
+            onInvoke: (intent) => zoom(intent.delta),
           ),
         },
         child: FocusScope(

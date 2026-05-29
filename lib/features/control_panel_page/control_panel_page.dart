@@ -372,7 +372,7 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                       ),
                       // ── 2D/Gazebo Toggle ───────────────────────────────
                       FilterChip(
-                        label: Text(useGazeboView ? '2D View' : 'Gazebo Sim'),
+                        label: Text(useGazeboView ? 'Gazebo Sim' : '2d View'),
                         selected: useGazeboView,
                         onSelected: (v) => ref.read(useGazebomapProvider.notifier).toggleGazebo(),
                         avatar: Icon(

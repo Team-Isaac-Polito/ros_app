@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/control_panel_page/data/gazebo_screenshot_manager/gazebo_screenshot_manager.dart';
-import 'package:isaac_app/features/control_panel_page/data/useGazebomap_notifier/useGazebomap_notifier.dart';
 import 'package:isaac_app/features/main_page/data/dark_mode_provider/dark_mode_provider.dart';
 import 'package:isaac_app/utils/palette.dart';
 
@@ -18,13 +17,6 @@ class GazeboRunningButtons extends ConsumerWidget {
       child: Row(
         spacing: 10,
         children: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-            onPressed: () {
-              ref.read(useGazebomapProvider.notifier).toggleGazebo();
-            },
-            child: Text("2d Map"),
-          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
             onPressed: () {

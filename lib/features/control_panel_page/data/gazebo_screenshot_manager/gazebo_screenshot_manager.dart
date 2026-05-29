@@ -16,6 +16,7 @@ class GazeboScreenshotManagerNotifier extends Notifier<Uint8List?> {
   ProcessResult? process;
   String? exception;
   void takeScreenshot() async {
+    print("Fired");
     try {
       process = await Process.run(
         "/bin/bash",
@@ -36,6 +37,7 @@ class GazeboScreenshotManagerNotifier extends Notifier<Uint8List?> {
       }
     } catch (e) {
       exception = e.toString();
+      print("Exception gazebo screenshot $exception");
     }
   }
 

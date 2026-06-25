@@ -96,6 +96,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                     },
                   ),
           ),
+          SliverToBoxAdapter(child: SetCustomRobotIpInput())
           // SliverToBoxAdapter(
           //   child: Padding(
           //     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),

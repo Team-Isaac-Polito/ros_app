@@ -3,3 +3,4 @@ export 'topic_expansion_tile/topic_expansion_tile.dart';
 export 'control_panel_card/control_panel_card.dart';
 export 'refresh_socket_connection/refresh_socket_connection.dart';
 export 'appbar_actions/appbar_actions.dart';
+export 'set_custom_robot_ip_input/set_custom_robot_ip.dart';

@@ -49,6 +49,7 @@ class ChangeIpDropdown extends ConsumerWidget {
                         if (currentRobotIp == entry.key) {
                            robotIpNotifier.changeIp("ws://localhost:9090");
                         }
+                        Navigator.of(context).pop(); // close the dropdown after remove
                       },
                       child: const Icon(Icons.close, size: 16, color: Colors.red),
                     )

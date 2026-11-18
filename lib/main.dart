@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/main_page/data/index.dart';
 import 'package:isaac_app/features/main_page/index.dart';
@@ -6,11 +6,9 @@ import 'package:isaac_app/utils/index.dart';
 
 void main() {
   runApp(
-     // Provider scope is needed so that riverpod can manage the app
-      ProviderScope(
-          child: const MyApp()
-      )
-    );
+    // Provider scope is needed so that riverpod can manage the app
+    ProviderScope(child: const MyApp()),
+  );
 }
 
 class MyApp extends ConsumerWidget {

@@ -109,12 +109,14 @@ final laserScanProvider = StreamProvider<LaserScanData>((ref) {
 /// Scan points transformed to map frame.
 /// Prefer laser_frame_stabilized (fixed on base_link) when available.
 final mapFrameScanProvider = Provider<List<LaserPoint>>((ref) {
-  final scan = ref.watch(laserScanProvider).value;
+  final scan = ref.watch(laserScanProvider).whenOrNull(data: (scan) => scan);
   if (scan == null) return [];
 
   // Primary path: scan already published from laser_frame_stabilized.
   if (scan.frameId == 'laser_frame_stabilized') {
-    final basePose = ref.watch(robotPoseProvider).value;
+    final basePose = ref.watch(robotPoseProvider).whenOrNull(
+      data: (pose) => pose,
+    );
     if (basePose == null) return [];
 
     // Matches lidar.xacro: laser_frame_stabilized fixed on base_link.
@@ -136,7 +138,9 @@ final mapFrameScanProvider = Provider<List<LaserPoint>>((ref) {
   }
 
   // Fallback for older scans that still use laser_frame mounted on chassis2_link.
-  final segments = ref.watch(robotSegmentsProvider).value;
+  final segments = ref.watch(robotSegmentsProvider).whenOrNull(
+    data: (segments) => segments,
+  );
   if (segments == null || segments.length < 2) return [];
   final chassis2 = segments[1];
   const laserLocalX = -0.07;
@@ -203,7 +207,7 @@ final robotPoseProvider = StreamProvider<RobotPose>((ref) {
       y: moY + sinM * obX + cosM * obY,
       yaw: moYaw + obYaw,
     );
-  }).handleError((_) {});
+  });
 });
 
 /// Robot body segment poses in the map frame.
@@ -307,7 +311,7 @@ final robotSegmentsProvider = StreamProvider<List<SegmentPose>>((ref) {
     }
 
     return segments;
-  }).handleError((_) {});
+  });
 });
 
 /// Compose transforms from base_link to target chassis through joint chain

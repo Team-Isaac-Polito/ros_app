@@ -10,9 +10,13 @@ class GazeboProcessManager extends Notifier<bool> {
   Process? _process;
   Timer? _timer;
   String? _exception;
+  bool _isDisposed = false;
 
   Future<void> _checkInitialStatus() async {
-    state = await isProcessRunning();
+    final isRunning = await isProcessRunning();
+    if (!_isDisposed) {
+      state = isRunning;
+    }
   }
 
   Future<bool> isProcessRunning() async {
@@ -29,7 +33,7 @@ class GazeboProcessManager extends Notifier<bool> {
   void startMonitoring() {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
       final isRunning = await isProcessRunning();
-      if (state != isRunning) {
+      if (!_isDisposed && state != isRunning) {
         state = isRunning;
       }
     });
@@ -84,6 +88,7 @@ class GazeboProcessManager extends Notifier<bool> {
     startMonitoring();
 
     ref.onDispose(() {
+      _isDisposed = true;
       _timer?.cancel();
     });
 

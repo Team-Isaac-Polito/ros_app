@@ -14,7 +14,8 @@ class SetCustomRobotIpInput extends ConsumerStatefulWidget {
 class _SetCustomRobotIpInputState extends ConsumerState<SetCustomRobotIpInput> {
   final GlobalKey<FormState> _addIpFormKey = GlobalKey<FormState>();
   final TextEditingController _ipController = TextEditingController();
-  final TextEditingController _labelController = TextEditingController(); // Aggiungiamo un nome per l'IP
+  final TextEditingController _labelController =
+      TextEditingController(); // Aggiungiamo un nome per l'IP
 
   @override
   void dispose() {
@@ -34,7 +35,9 @@ class _SetCustomRobotIpInputState extends ConsumerState<SetCustomRobotIpInput> {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.5)),
+          side: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+          ),
         ),
         color: colorScheme.surfaceContainerLow,
         child: Padding(
@@ -46,17 +49,23 @@ class _SetCustomRobotIpInputState extends ConsumerState<SetCustomRobotIpInput> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.add_link_rounded, color: colorScheme.primary, size: 22),
+                    Icon(
+                      Icons.add_link_rounded,
+                      color: colorScheme.primary,
+                      size: 22,
+                    ),
                     const SizedBox(width: 10),
-                    Text("Add New Target Machine",
+                    Text(
+                      "Add New Target Machine",
                       style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold, color: colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                
+
                 TextFormField(
                   controller: _ipController,
                   keyboardType: TextInputType.url,
@@ -66,12 +75,15 @@ class _SetCustomRobotIpInputState extends ConsumerState<SetCustomRobotIpInput> {
                     labelText: 'IP Address / Host',
                     hintText: '192.168.1.100:9090',
                     prefixText: 'ws:// ',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Required' : null,
                 ),
                 const SizedBox(height: 12),
-    
+
                 TextFormField(
                   controller: _labelController,
                   decoration: InputDecoration(
@@ -79,40 +91,52 @@ class _SetCustomRobotIpInputState extends ConsumerState<SetCustomRobotIpInput> {
                     labelText: 'Machine Label (Optional)',
                     hintText: 'e.g. Robot Lab B',
                     prefixIcon: const Icon(Icons.label_outline, size: 20),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        backgroundColor: Colors.blue
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      backgroundColor: Colors.blue,
                     ),
                     onPressed: () {
                       if (_addIpFormKey.currentState!.validate()) {
                         final cleanIp = "ws://${_ipController.text.trim()}";
-                        final label = _labelController.text.trim().isEmpty 
-                                    ? "Custom Robot" 
-                                    : _labelController.text.trim();
-                        
-                        ref.read(robotIpListProvider.notifier).addIp(cleanIp, label);
-                        
+                        final label = _labelController.text.trim().isEmpty
+                            ? "Custom Robot"
+                            : _labelController.text.trim();
+
+                        ref
+                            .read(robotIpListProvider.notifier)
+                            .addIp(cleanIp, label);
+
                         _ipController.clear();
                         _labelController.clear();
-    
+
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('$label added to connection list!')),
+                          SnackBar(
+                            content: Text('$label added to connection list!'),
+                          ),
                         );
                       }
                     },
-                    icon: const Icon(Icons.add, size: 20,color: white),
-                    label: const Text('Add to Dropdown', style: TextStyle(fontWeight: FontWeight.w600, color: white)),
+                    icon: const Icon(Icons.add, size: 20, color: white),
+                    label: const Text(
+                      'Add to Dropdown',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: white,
+                      ),
+                    ),
                   ),
                 ),
               ],

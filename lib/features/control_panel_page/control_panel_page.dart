@@ -294,15 +294,23 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
   @override
   Widget build(BuildContext context) {
     final mapAsync = ref.watch(mapProvider);
+    final laserScanAsync = ref.watch(laserScanProvider);
     final mapScanPoints = ref.watch(mapFrameScanProvider);
     final poseAsync = ref.watch(robotPoseProvider);
-    final robotSegments = ref.watch(robotSegmentsProvider).value ?? [];
+    final robotSegmentsAsync = ref.watch(robotSegmentsProvider);
+    final robotSegments =
+        robotSegmentsAsync.whenOrNull(data: (segments) => segments) ?? [];
+    final transformErrors = [
+      if (laserScanAsync.hasError) 'Laser scan: ${laserScanAsync.error}',
+      if (poseAsync.hasError) 'Robot pose: ${poseAsync.error}',
+      if (robotSegmentsAsync.hasError)
+        'Robot segments: ${robotSegmentsAsync.error}',
+    ];
     final statusAsync = ref.watch(autonomyStatusProvider);
     final healthAsync = ref.watch(autonomyHealthProvider);
     final cmdSrcAsync = ref.watch(autonomyCmdSourceProvider);
     final colorScheme = Theme.of(context).colorScheme;
-    final bool useGazeboView = ref.watch(useGazebomapProvider); 
-
+    final bool useGazeboView = ref.watch(useGazebomapProvider);
 
     const switchLabels = [
       (0, 'S1 – Beak Open/Close'),
@@ -372,9 +380,13 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                       ),
                       // ── 2D/Gazebo Toggle ───────────────────────────────
                       FilterChip(
-                        label: Text(useGazeboView ? '2d View' : 'Gazebo Simulation'),
+                        label: Text(
+                          useGazeboView ? '2d View' : 'Gazebo Simulation',
+                        ),
                         selected: useGazeboView,
-                        onSelected: (v) => ref.read(useGazebomapProvider.notifier).toggleGazebo(),
+                        onSelected: (v) => ref
+                            .read(useGazebomapProvider.notifier)
+                            .toggleGazebo(),
                         avatar: Icon(
                           useGazeboView ? Icons.view_in_ar : Icons.map,
                           size: 16,
@@ -452,7 +464,9 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                               final scanPoints = _showScan
                                   ? mapScanPoints
                                   : <LaserPoint>[];
-                              final robotPose = poseAsync.value;
+                              final robotPose = poseAsync.whenOrNull(
+                                data: (pose) => pose,
+                              );
 
                               // ── Gazebo View ──────────────────────────────
                               if (useGazeboView) {
@@ -461,7 +475,7 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                                   child: Container(
                                     key: _mapContainerKey,
                                     color: const Color(0xFF0A0E27),
-                                    child:ReqGazeboScreenPage(),
+                                    child: ReqGazeboScreenPage(),
                                   ),
                                 );
                               }
@@ -617,6 +631,38 @@ class _ControlPanelPageState extends ConsumerState<ControlPanelPage> {
                             },
                           ),
                         ),
+                        if (!useGazeboView && transformErrors.isNotEmpty)
+                          Positioned(
+                            top: 8,
+                            left: 8,
+                            right: 8,
+                            child: Material(
+                              color: colorScheme.errorContainer,
+                              borderRadius: BorderRadius.circular(8),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline,
+                                      color: colorScheme.onErrorContainer,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        transformErrors.join('\n'),
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: colorScheme.onErrorContainer,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         // ── Arm joystick + Z slider (bottom-left) ────────
                         Align(
                           alignment: Alignment.bottomLeft,

@@ -114,9 +114,9 @@ final mapFrameScanProvider = Provider<List<LaserPoint>>((ref) {
 
   // Primary path: scan already published from laser_frame_stabilized.
   if (scan.frameId == 'laser_frame_stabilized') {
-    final basePose = ref.watch(robotPoseProvider).whenOrNull(
-      data: (pose) => pose,
-    );
+    final basePose = ref
+        .watch(robotPoseProvider)
+        .whenOrNull(data: (pose) => pose);
     if (basePose == null) return [];
 
     // Matches lidar.xacro: laser_frame_stabilized fixed on base_link.
@@ -129,18 +129,20 @@ final mapFrameScanProvider = Provider<List<LaserPoint>>((ref) {
 
     final pts = <LaserPoint>[];
     for (final pt in scan.toPoints()) {
-      pts.add(LaserPoint(
-        laserX + pt.x * cosYaw - pt.y * sinYaw,
-        laserY + pt.x * sinYaw + pt.y * cosYaw,
-      ));
+      pts.add(
+        LaserPoint(
+          laserX + pt.x * cosYaw - pt.y * sinYaw,
+          laserY + pt.x * sinYaw + pt.y * cosYaw,
+        ),
+      );
     }
     return pts;
   }
 
   // Fallback for older scans that still use laser_frame mounted on chassis2_link.
-  final segments = ref.watch(robotSegmentsProvider).whenOrNull(
-    data: (segments) => segments,
-  );
+  final segments = ref
+      .watch(robotSegmentsProvider)
+      .whenOrNull(data: (segments) => segments);
   if (segments == null || segments.length < 2) return [];
   final chassis2 = segments[1];
   const laserLocalX = -0.07;
@@ -150,10 +152,12 @@ final mapFrameScanProvider = Provider<List<LaserPoint>>((ref) {
   final laserY = chassis2.y + laserLocalX * sinYaw;
   final pts = <LaserPoint>[];
   for (final pt in scan.toPoints()) {
-    pts.add(LaserPoint(
-      laserX + pt.x * cosYaw - pt.y * sinYaw,
-      laserY + pt.x * sinYaw + pt.y * cosYaw,
-    ));
+    pts.add(
+      LaserPoint(
+        laserX + pt.x * cosYaw - pt.y * sinYaw,
+        laserY + pt.x * sinYaw + pt.y * cosYaw,
+      ),
+    );
   }
   return pts;
 });
@@ -178,7 +182,8 @@ final robotPoseProvider = StreamProvider<RobotPose>((ref) {
   return client.subscribe('/tf').map((msg) {
     final transforms = msg['transforms'] as List<dynamic>;
     for (final t in transforms) {
-      final parentFrame = (t['header'] as Map<String, dynamic>)['frame_id'] as String;
+      final parentFrame =
+          (t['header'] as Map<String, dynamic>)['frame_id'] as String;
       final childFrame = t['child_frame_id'] as String;
       final trans = t['transform']['translation'] as Map<String, dynamic>;
       final rot = t['transform']['rotation'] as Map<String, dynamic>;
@@ -189,10 +194,14 @@ final robotPoseProvider = StreamProvider<RobotPose>((ref) {
       final yaw = 2.0 * math.atan2(qz, qw);
 
       if (parentFrame == 'map' && childFrame == 'odom') {
-        moX = tx; moY = ty; moYaw = yaw;
+        moX = tx;
+        moY = ty;
+        moYaw = yaw;
         hasMapOdom = true;
       } else if (parentFrame == 'odom' && childFrame == 'base_link') {
-        obX = tx; obY = ty; obYaw = yaw;
+        obX = tx;
+        obY = ty;
+        obYaw = yaw;
         hasOdomBase = true;
       }
     }
@@ -241,7 +250,8 @@ final robotSegmentsProvider = StreamProvider<List<SegmentPose>>((ref) {
   final staticSub = client.subscribe('/tf_static').listen((msg) {
     final tfList = msg['transforms'] as List<dynamic>;
     for (final t in tfList) {
-      final parent = (t['header'] as Map<String, dynamic>)['frame_id'] as String;
+      final parent =
+          (t['header'] as Map<String, dynamic>)['frame_id'] as String;
       final child = t['child_frame_id'] as String;
       final trans = t['transform']['translation'] as Map<String, dynamic>;
       final rot = t['transform']['rotation'] as Map<String, dynamic>;
@@ -260,7 +270,8 @@ final robotSegmentsProvider = StreamProvider<List<SegmentPose>>((ref) {
   return client.subscribe('/tf').map((msg) {
     final tfList = msg['transforms'] as List<dynamic>;
     for (final t in tfList) {
-      final parent = (t['header'] as Map<String, dynamic>)['frame_id'] as String;
+      final parent =
+          (t['header'] as Map<String, dynamic>)['frame_id'] as String;
       final child = t['child_frame_id'] as String;
       final trans = t['transform']['translation'] as Map<String, dynamic>;
       final rot = t['transform']['rotation'] as Map<String, dynamic>;
@@ -273,11 +284,15 @@ final robotSegmentsProvider = StreamProvider<List<SegmentPose>>((ref) {
 
       if (parent == 'map' && child == 'odom') {
         final yaw = 2.0 * math.atan2(qz, qw);
-        moX = tx; moY = ty; moYaw = yaw;
+        moX = tx;
+        moY = ty;
+        moYaw = yaw;
         hasMapOdom = true;
       } else if (parent == 'odom' && child == 'base_link') {
         final yaw = 2.0 * math.atan2(qz, qw);
-        obX = tx; obY = ty; obYaw = yaw;
+        obX = tx;
+        obY = ty;
+        obYaw = yaw;
         hasOdomBase = true;
       } else {
         transforms['$parent->$child'] = _TF3D(tx, ty, qx, qy, qz, qw);
@@ -317,7 +332,11 @@ final robotSegmentsProvider = StreamProvider<List<SegmentPose>>((ref) {
 /// Compose transforms from base_link to target chassis through joint chain
 /// using proper 3D quaternion math.
 _TF3D? _chainFromChassis(
-    Map<String, _TF3D> tfs, _TF3D start, int from, int to) {
+  Map<String, _TF3D> tfs,
+  _TF3D start,
+  int from,
+  int to,
+) {
   var current = start;
 
   // base_link→chassis1_link
@@ -352,14 +371,26 @@ _TF3D _compose3D(_TF3D parent, _TF3D child) {
   final nx = parent.x + cos * child.x - sin * child.y;
   final ny = parent.y + sin * child.x + cos * child.y;
   // Quaternion multiplication: parent * child
-  final nqw = parent.qw * child.qw - parent.qx * child.qx -
-      parent.qy * child.qy - parent.qz * child.qz;
-  final nqx = parent.qw * child.qx + parent.qx * child.qw +
-      parent.qy * child.qz - parent.qz * child.qy;
-  final nqy = parent.qw * child.qy - parent.qx * child.qz +
-      parent.qy * child.qw + parent.qz * child.qx;
-  final nqz = parent.qw * child.qz + parent.qx * child.qy -
-      parent.qy * child.qx + parent.qz * child.qw;
+  final nqw =
+      parent.qw * child.qw -
+      parent.qx * child.qx -
+      parent.qy * child.qy -
+      parent.qz * child.qz;
+  final nqx =
+      parent.qw * child.qx +
+      parent.qx * child.qw +
+      parent.qy * child.qz -
+      parent.qz * child.qy;
+  final nqy =
+      parent.qw * child.qy -
+      parent.qx * child.qz +
+      parent.qy * child.qw +
+      parent.qz * child.qx;
+  final nqz =
+      parent.qw * child.qz +
+      parent.qx * child.qy -
+      parent.qy * child.qx +
+      parent.qz * child.qw;
   return _TF3D(nx, ny, nqx, nqy, nqz, nqw);
 }
 
@@ -367,30 +398,30 @@ class _TF3D {
   final double x, y;
   final double qx, qy, qz, qw;
   const _TF3D(this.x, this.y, this.qx, this.qy, this.qz, this.qw);
-  double get yaw => math.atan2(
-      2.0 * (qw * qz + qx * qy), 1.0 - 2.0 * (qy * qy + qz * qz));
+  double get yaw =>
+      math.atan2(2.0 * (qw * qz + qx * qy), 1.0 - 2.0 * (qy * qy + qz * qz));
 }
 
 /// Streams autonomy status from `/autonomy/explorer_status`.
 final autonomyStatusProvider = StreamProvider<String>((ref) {
   final client = ref.watch(rosBridgeClientProvider);
-  return client.subscribe('/autonomy/explorer_status').map(
-    (msg) => msg['data'] as String? ?? '',
-  );
+  return client
+      .subscribe('/autonomy/explorer_status')
+      .map((msg) => msg['data'] as String? ?? '');
 });
 
 /// Streams health from `/autonomy/health`.
 final autonomyHealthProvider = StreamProvider<String>((ref) {
   final client = ref.watch(rosBridgeClientProvider);
-  return client.subscribe('/autonomy/health').map(
-    (msg) => msg['data'] as String? ?? '',
-  );
+  return client
+      .subscribe('/autonomy/health')
+      .map((msg) => msg['data'] as String? ?? '');
 });
 
 /// Streams cmd source from `/autonomy/cmd_source`.
 final autonomyCmdSourceProvider = StreamProvider<String>((ref) {
   final client = ref.watch(rosBridgeClientProvider);
-  return client.subscribe('/autonomy/cmd_source').map(
-    (msg) => msg['data'] as String? ?? '',
-  );
+  return client
+      .subscribe('/autonomy/cmd_source')
+      .map((msg) => msg['data'] as String? ?? '');
 });

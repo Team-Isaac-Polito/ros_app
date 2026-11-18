@@ -6,8 +6,7 @@ final showDetailProvider = NotifierProvider<ShowDetailsNotifier, bool>(
 
 class ShowDetailsNotifier extends Notifier<bool> {
   void toggleBanner() {
-    bool oldState = !state;
-    state = oldState;
+    state = !state;
   }
 
   @override

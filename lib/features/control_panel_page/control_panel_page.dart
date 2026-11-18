@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isaac_app/features/control_panel_page/components/req_gazebo_screen_page/req_gazebo_screen_page.dart';
 import 'package:isaac_app/features/control_panel_page/data/autonomy_providers.dart';

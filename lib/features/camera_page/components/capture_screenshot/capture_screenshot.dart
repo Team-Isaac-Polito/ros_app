@@ -24,11 +24,10 @@ class CaptureScreenshot extends ConsumerWidget {
     final cameraState = ref.watch(cameraProvider);
 
     return ElevatedButton.icon(
-      onPressed: () {
-        print("Listening $topicToListen");
-
+      onPressed: () async {
         if (cameraState.isLoading ||
-            cameraState.value == CAMERA_MODE.INITIALIZING || cameraState.value == CAMERA_MODE.OFF) {
+            cameraState.value == CAMERA_MODE.INITIALIZING ||
+            cameraState.value == CAMERA_MODE.OFF) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
@@ -41,9 +40,21 @@ class CaptureScreenshot extends ConsumerWidget {
           return;
         }
         if (isEmpty) {
-          ref
-              .read(cameraProvider.notifier)
-              .requestScreenshot(activeMonitor, topicToListen);
+          try {
+            await ref
+                .read(cameraProvider.notifier)
+                .requestScreenshot(activeMonitor, topicToListen);
+          } catch (error) {
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text('Failed to capture screenshot: $error'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+          }
         } else {
           ref
               .read(manualScreenShotProvider.notifier)

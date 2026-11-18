@@ -13,7 +13,6 @@ class UseGazeboMapNotifier extends Notifier<bool> {
 
   @override
   bool build() {
-    state = false;
     return false;
   }
 }
